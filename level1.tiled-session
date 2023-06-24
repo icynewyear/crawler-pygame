@@ -1,0 +1,72 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "levels/level0.tmx",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "levels/level0.tmx": {
+            "scale": 6.444166666666666,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 59.123238070606504,
+                "y": 39.26031294452347
+            }
+        },
+        "tiles/blackBG_tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tiles/caves.tsx": {
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "tiles/character_b.tsx": {
+            "scaleInDock": 4.4512,
+            "scaleInEditor": 1
+        },
+        "tiles/props1.tsx": {
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "tiles/tileset.tsx": {
+            "scaleInDock": 4.6556,
+            "scaleInEditor": 6.5106
+        },
+        "tiles/tileset_b.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/antho/projects/fish-pygame/data/level0",
+    "last.imagePath": "C:/Users/antho/Downloads/1bit doungeon platformer/1bit doungeon platformer/Black_Blackground",
+    "map.fixedSize": true,
+    "map.height": 10,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "map.width": 15,
+    "openFiles": [
+        "tiles/tileset.tsx",
+        "levels/level0.tmx",
+        "tiles/character_b.tsx"
+    ],
+    "project": "level1.tiled-project",
+    "recentFiles": [
+        "tiles/tileset.tsx",
+        "tiles/character_b.tsx",
+        "levels/level0.tmx",
+        "tiles/blackBG_tileset.tsx",
+        "tiles/tileset_b.tsx",
+        "tiles/caves.tsx",
+        "tiles/props1.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
+}
