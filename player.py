@@ -11,9 +11,8 @@ class Player(pygame.sprite.Sprite):
         self.pos = pos
         self.facing = 'right'
         self.direction = pygame.math.Vector2(0, 0)
-        self.speed = 4
+        self.speed = 1
         self.gravity = .6
-        self.falling_lockout = Timer(200)
         
         #image and animation
         self.frames = import_folder('graphics/player/walk')
@@ -62,8 +61,9 @@ class Player(pygame.sprite.Sprite):
             self.rect.y += self.speed/2
             self.pos = self.rect.topleft
                
-        if keys[pygame.K_SPACE] and self.on_ground:
-            self.jump()
+        if keys[pygame.K_SPACE]:
+            if self.on_ground:
+                self.jump()
                     
     def get_hitbox_from_image(self, surf):
         image_mask = pygame.mask.from_surface(surf)
@@ -79,25 +79,33 @@ class Player(pygame.sprite.Sprite):
               
     def do_movement(self):
         self.rect.x += self.direction.x * self.speed
-    
+        self.pos = self.rect.topleft
+        
     def do_movement_step(self):
+        self.do_gravity()
+        self.rect.y += self.direction.y
         self.rect.x += self.direction.x * self.speed
         self.pos = self.rect.topleft
+        
     
     def jump(self):
         self.direction.y = -12
         self.on_ground = False
     
     def do_gravity(self):
-        self.direction.y += self.gravity
-        self.pos += self.direction
-        self.rect.topleft = self.pos
-        
+        if not self.on_ladder:
+            self.direction.y += self.gravity
+            
+    def do_gravity_old(self):
+        if not self.on_ladder:
+            self.direction.y += self.gravity
+            self.rect.y += self.direction.y
+            self.pos = self.rect.topleft
+            
     def update(self):
-        self.show_hitboxes()
-
+        
         self.get_input()
         self.do_movement_step()
-        
-        self.falling_lockout.update()
+        #self.do_gravity()
         self.animate()
+        self.show_hitboxes()

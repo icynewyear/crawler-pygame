@@ -114,8 +114,8 @@ class Level:
     
     def vertical_movement_collision(self):
         player = self.player
-        debug(player.on_ladder, (80,80))
-        if not player.on_ladder: player.do_gravity()
+        debug(player.direction, (80,80))
+       # if not player.on_ladder: player.do_gravity()
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.y < 0:
