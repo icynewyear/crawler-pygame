@@ -4,6 +4,8 @@ level_0 = {
     'ladders': 'data/level0/level0._ladders.csv',
     'bridges': 'data/level0/level0._bridges.csv',
     'waterfalls': 'data/level0/level0._waterfalls.csv',
+    'enemies': 'data/level0/level0._enemies.csv',
+    'doors': 'data/level0/level0._doors.csv',
 }
 
 levels = {

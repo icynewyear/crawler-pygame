@@ -45,3 +45,12 @@ class Waterfall(AnimatedTile):
             frames = new_surf_list
                 
         super().__init__(pos, size, frames)
+
+class Door(StaticTile):
+    def __init__(self, pos, state = 'closed'):
+        print(state)
+        image = pygame.image.load('graphics/door/'+ state + '.png').convert_alpha()
+        
+        surface = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
+    
+        super().__init__(pos, TILE_SIZE, surface)

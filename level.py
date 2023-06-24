@@ -1,7 +1,8 @@
 import pygame
 from settings import *
 from player import Player
-from tiles import Tile, StaticTile, Waterfall
+from tiles import *
+from enemies import Enemy
 from misc_functions import *
 from gamedata import levels
 
@@ -37,6 +38,14 @@ class Level:
         #waterfalls
         self.waterfall_layout = import_csv_layout(self.level_data['waterfalls'])
         self.waterfall_tiles = self.create_tile_group(self.waterfall_layout, 'waterfalls')
+        
+        #doors
+        self.door_layout = import_csv_layout(self.level_data['doors'])
+        self.door_tiles = self.create_tile_group(self.door_layout, 'doors')
+        
+        #enemeies
+        self.enemies_layout = import_csv_layout(self.level_data['enemies'])
+        self.enemies = self.create_tile_group(self.enemies_layout, 'enemies')
         
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites()
@@ -94,7 +103,15 @@ class Level:
                             tile = Waterfall((x,y), TILE_SIZE, 'water')
                         elif col == '22':
                             tile = Waterfall((x,y), TILE_SIZE, 'water', True)
-                        
+                     
+                    if tile_type == 'enemies':
+                        tile = Enemy((x,y), col)  
+                    
+                    if tile_type == 'doors':
+                        if col == '2': state = 'open' 
+                        else: state = 'closed'
+                        tile = Door((x,y), state)
+                      
                     group.add(tile)
         return group
     
@@ -159,7 +176,15 @@ class Level:
         self.waterfall_tiles.update()
         self.waterfall_tiles.draw(self.screen)
         
-           #Player
+        #doors
+        self.door_tiles.update()
+        self.door_tiles.draw(self.screen)
+        
+        #enemies
+        self.enemies.update()
+        self.enemies.draw(self.screen)
+        
+        #Player
         
         
         self.ladder_collision()

@@ -43,27 +43,33 @@ class Player(pygame.sprite.Sprite):
    
     def get_input(self):
         keys = pygame.key.get_pressed()
+        step = False
         
         #left and right
         if keys[pygame.K_LEFT]:
             self.direction = pygame.math.Vector2(-1, 0)
             self.facing = 'left'
+            step = True
         elif keys[pygame.K_RIGHT]:
             self.direction = pygame.math.Vector2(1, 0)
             self.facing = 'right'
+            step = True
         else:
             self.direction.x = 0
             
         if keys[pygame.K_UP] and self.on_ladder:
             self.rect.y -= self.speed/2
             self.pos = self.rect.topleft
+            step = True
         elif keys[pygame.K_DOWN] and self.on_ladder:
             self.rect.y += self.speed/2
             self.pos = self.rect.topleft
-               
+            step = True
+            
         if keys[pygame.K_SPACE]:
             if self.on_ground:
                 self.jump()
+        return step
                     
     def get_hitbox_from_image(self, surf):
         image_mask = pygame.mask.from_surface(surf)
@@ -87,7 +93,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.direction.x * self.speed
         self.pos = self.rect.topleft
         
-    
     def jump(self):
         self.direction.y = -12
         self.on_ground = False
