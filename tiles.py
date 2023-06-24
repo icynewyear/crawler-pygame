@@ -46,11 +46,23 @@ class Waterfall(AnimatedTile):
                 
         super().__init__(pos, size, frames)
 
+class Coin(AnimatedTile):
+    def __init__(self, pos):
+        path = 'graphics/coin'
+        frames = import_folder(path)
+        super().__init__(pos, TILE_SIZE, frames)
+        self.animation_speed = .1
+        
+        
 class Door(StaticTile):
     def __init__(self, pos, state = 'closed'):
-        print(state)
         image = pygame.image.load('graphics/door/'+ state + '.png').convert_alpha()
-        
         surface = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
-    
         super().__init__(pos, TILE_SIZE, surface)
+
+class Chest(StaticTile):
+    def __init__(self, pos, state = 'closed'):
+        image = pygame.image.load('graphics/chest/'+ state + '.png').convert_alpha()
+        surface = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
+        super().__init__(pos, TILE_SIZE, surface)
+    

@@ -1,0 +1,52 @@
+{
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "levels/level0.tmx": {
+            "scale": 6.444166666666666,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 46.24337255916204,
+                "y": 34.682529419371534
+            }
+        },
+        "tiles/blackBG_tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tiles/caves.tsx": {
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "tiles/character_b.tsx": {
+            "scaleInDock": 4.4512,
+            "scaleInEditor": 1
+        },
+        "tiles/props1.tsx": {
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "tiles/tileset.tsx": {
+            "scaleInDock": 4.6556,
+            "scaleInEditor": 6.5106
+        },
+        "tiles/tileset_b.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "openFiles": [
+        "tiles/tileset.tsx",
+        "levels/level0.tmx",
+        "tiles/character_b.tsx"
+    ],
+    "recentFiles": [
+        "tiles/tileset.tsx",
+        "tiles/character_b.tsx",
+        "levels/level0.tmx",
+        "tiles/blackBG_tileset.tsx",
+        "tiles/tileset_b.tsx",
+        "tiles/caves.tsx",
+        "tiles/props1.tsx"
+    ]
+}

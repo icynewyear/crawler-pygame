@@ -43,6 +43,14 @@ class Level:
         self.door_layout = import_csv_layout(self.level_data['doors'])
         self.door_tiles = self.create_tile_group(self.door_layout, 'doors')
         
+        #chests
+        self.chest_layout = import_csv_layout(self.level_data['chests'])
+        self.chest_tiles = self.create_tile_group(self.chest_layout, 'chests')
+        
+        #items
+        self.item_layout = import_csv_layout(self.level_data['items'])
+        self.item_tiles = self.create_tile_group(self.item_layout, 'items')
+        
         #enemeies
         self.enemies_layout = import_csv_layout(self.level_data['enemies'])
         self.enemies = self.create_tile_group(self.enemies_layout, 'enemies')
@@ -50,16 +58,6 @@ class Level:
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites()
         
-    def setup_level(self, layout):
-        self.tiles = pygame.sprite.Group()
-        for row_index, row in enumerate(layout):
-            for col_index, col in enumerate(row):
-                if col == 'W':
-                    
-                    image = pygame.image.load('graphics/terrain/wall.png').convert_alpha()
-                    tile = StaticTile((col_index * TILE_SIZE, row_index * TILE_SIZE), TILE_SIZE, pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE)))
-                    self.tiles.add(tile)
-    
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
             for col_index, col in enumerate(row):
@@ -111,6 +109,16 @@ class Level:
                         if col == '2': state = 'open' 
                         else: state = 'closed'
                         tile = Door((x,y), state)
+                        
+                    if tile_type == 'chests':
+                        if col == '2': state = 'open' 
+                        else: state = 'closed'
+                        tile = Chest((x,y), state)
+                    
+                    if tile_type == 'items':
+                        if col == '1':
+                            tile = Coin((x,y))
+                        
                       
                     group.add(tile)
         return group
@@ -179,6 +187,14 @@ class Level:
         #doors
         self.door_tiles.update()
         self.door_tiles.draw(self.screen)
+        
+        #chests
+        self.chest_tiles.update()
+        self.chest_tiles.draw(self.screen)
+        
+        #items
+        self.item_tiles.update()
+        self.item_tiles.draw(self.screen)
         
         #enemies
         self.enemies.update()
