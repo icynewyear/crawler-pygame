@@ -1,21 +1,8 @@
-# level_data = [
-# 'WWWWWWWWWWWW',
-# 'W          W',
-# 'W          W',
-# 'W          W',
-# 'W    W     W',
-# 'WWWWWWWWWWWW',
-# 'W          W',
-# 'WWWWWWWWWWWW',
-# 'W          W',
-# 'W          W',
-# 'W          W',
-# 'WWWWWWWWWWWW',
-# ]
+DEBUG = True
 
 # screen
 SCREEN_WIDTH = 960
-SCREEN_HEIGHT = 640
+SCREEN_HEIGHT = 712
 TILE_SIZE = 64
 TILESET_SIZE = 8
 
@@ -27,4 +14,7 @@ NEON_GREEN = (27, 249, 5)
 YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+RED = (255,0,0)
 ORANGE = (255, 165, 0)
+GREY = (128, 128, 128)
+BROWN = (165, 42, 42)

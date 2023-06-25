@@ -14,6 +14,10 @@ class Player(pygame.sprite.Sprite):
         self.speed = 1
         self.gravity = .6
         
+        #combat
+        self.max_health = 3
+        self.current_health = self.max_health
+        
         #image and animation
         self.frames = import_folder('graphics/player/walk')
         self.frame_index = 0
@@ -31,6 +35,24 @@ class Player(pygame.sprite.Sprite):
         self.on_ceiling = False
         self.on_left = False
         self.on_right = False
+        
+        #invetory
+        self.inventory = []
+        self.inventory_test()
+
+    def inventory_test(self):
+        item = pygame.image.load('graphics/unsorted/sword_a.png').convert_alpha()
+        self.add_inventory('sword', item)
+        item = pygame.image.load('graphics/unsorted/shield_a.png').convert_alpha()
+        self.add_inventory('shield', item)
+        item = pygame.image.load('graphics/unsorted/boots_a.png').convert_alpha()
+        self.add_inventory('boots', item)
+        item = pygame.image.load('graphics/unsorted/orb_a.png').convert_alpha()
+        self.add_inventory('orb', item)
+        item = pygame.image.load('graphics/unsorted/key_a.png').convert_alpha()
+        self.add_inventory('key', item)
+        
+        self.current_health = 1
 
     def animate(self):
         self.frame_index += self.animation_speed
@@ -78,11 +100,11 @@ class Player(pygame.sprite.Sprite):
      
     def show_hitboxes(self):
         screen = pygame.display.get_surface()
-        
-        pygame.draw.rect(screen, NEON_GREEN, self.rect, 3)
-        pygame.draw.circle(screen, LIGHT_BLUE, self.pos, 5)  
-        pygame.draw.circle(screen, ORANGE, (self.rect.right, self.rect.centery), 5)
-              
+        if DEBUG:
+            pygame.draw.rect(screen, NEON_GREEN, self.rect, 3)
+            pygame.draw.circle(screen, LIGHT_BLUE, self.pos, 5)  
+            pygame.draw.circle(screen, ORANGE, (self.rect.right, self.rect.centery), 5)
+                
     def do_movement(self):
         self.rect.x += self.direction.x * self.speed
         self.pos = self.rect.topleft
@@ -106,7 +128,10 @@ class Player(pygame.sprite.Sprite):
             self.direction.y += self.gravity
             self.rect.y += self.direction.y
             self.pos = self.rect.topleft
-            
+    
+    def add_inventory(self, name, image):
+        self.inventory.append((name, image))
+    
     def update(self):
         
         self.get_input()

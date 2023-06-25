@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+from ui import UI
 from player import Player
 from tiles import *
 from enemies import Enemy
@@ -11,12 +12,13 @@ from debug import debug
 class Level:
     def __init__(self, screen):
         self.screen = screen
-        # self.player = Player((SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-        # self.player = pygame.sprite.GroupSingle()
-        # self.player_setup(levels[0]['player'])
         
+        
+        #player
         self.player_layout = import_csv_layout(levels[0]['player'])
         self.player_sprites = self.create_tile_group(self.player_layout, 'player')
+        #ui
+        self.ui = UI(self.player_sprites.sprites()[0])
         
         #levels
         self.current_level = 0
@@ -139,7 +141,7 @@ class Level:
     
     def vertical_movement_collision(self):
         player = self.player
-        debug(player.direction, (80,80))
+        debug(player.inventory[0][0], (80,80))
        # if not player.on_ladder: player.do_gravity()
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(player.rect):
@@ -209,3 +211,5 @@ class Level:
         
         self.player_sprites.update() 
         self.player_sprites.draw(self.screen)
+        
+        self.ui.run()

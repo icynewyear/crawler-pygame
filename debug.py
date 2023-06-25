@@ -1,4 +1,5 @@
 import pygame
+from settings import DEBUG
 
 #intitialize pygame
 pygame.init()
@@ -11,4 +12,5 @@ def debug(output, pos=(0,0)):
     #render text
     text = font.render(str(output), True, (255, 255, 255))   
     #display text
-    screen.blit(text, pos)
+    if DEBUG:
+        screen.blit(text, pos)
