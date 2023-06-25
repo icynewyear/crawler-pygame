@@ -3,16 +3,18 @@ from settings import *
 from misc_functions import *
 from debug import *
 from timer import Timer
+from gamedata import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, check_for_interaction):
         super().__init__()
         #pos and movement
         self.pos = pos
         self.facing = 'right'
         self.direction = pygame.math.Vector2(0, 0)
-        self.speed = 1
+        self.speed = 64
         self.gravity = .6
+        self.movement_lockout = Timer(300)
         
         #combat
         self.max_health = 3
@@ -37,8 +39,11 @@ class Player(pygame.sprite.Sprite):
         self.on_right = False
         
         #invetory
+        self.check_for_interaction = check_for_interaction
+        self.coins = 0
+        self.lives = 3
         self.inventory = []
-        self.inventory_test()
+       # self.inventory_test()
 
     def inventory_test(self):
         item = pygame.image.load('graphics/unsorted/sword_a.png').convert_alpha()
@@ -54,6 +59,20 @@ class Player(pygame.sprite.Sprite):
         
         self.current_health = 1
 
+    def check_item_in_inventory(self, item):
+        for i in self.inventory:
+            if i[0] == item:
+                return True
+        return False
+    
+    def add_inventory(self, name, image):
+        self.inventory.append((name, image))
+    
+    def remove_inventory(self, item):
+        for i in self.inventory:
+            if i[0] == item:
+                self.inventory.remove(i)
+    
     def animate(self):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(self.frames):
@@ -69,28 +88,36 @@ class Player(pygame.sprite.Sprite):
         
         #left and right
         if keys[pygame.K_LEFT]:
-            self.direction = pygame.math.Vector2(-1, 0)
+            self.rect.x -= self.speed
             self.facing = 'left'
             step = True
         elif keys[pygame.K_RIGHT]:
-            self.direction = pygame.math.Vector2(1, 0)
+            self.rect.x += self.speed
             self.facing = 'right'
             step = True
-        else:
-            self.direction.x = 0
+        self.pos = self.rect.topleft
             
+        #ladder  
         if keys[pygame.K_UP] and self.on_ladder:
-            self.rect.y -= self.speed/2
+            self.rect.y -= self.speed
             self.pos = self.rect.topleft
             step = True
         elif keys[pygame.K_DOWN] and self.on_ladder:
-            self.rect.y += self.speed/2
+            self.rect.y += self.speed
             self.pos = self.rect.topleft
             step = True
+        #interactables
+        if keys[pygame.K_e]:
+            self.check_for_interaction()
+            step = False
             
-        if keys[pygame.K_SPACE]:
+        #jump (Neeeds rework)    
+        if keys[pygame.K_SPACE] and self.check_item_in_inventory('boots'):
             if self.on_ground:
                 self.jump()
+                
+        if step: 
+            self.movement_lockout.start()
         return step
                     
     def get_hitbox_from_image(self, surf):
@@ -104,38 +131,22 @@ class Player(pygame.sprite.Sprite):
             pygame.draw.rect(screen, NEON_GREEN, self.rect, 3)
             pygame.draw.circle(screen, LIGHT_BLUE, self.pos, 5)  
             pygame.draw.circle(screen, ORANGE, (self.rect.right, self.rect.centery), 5)
-                
-    def do_movement(self):
-        self.rect.x += self.direction.x * self.speed
-        self.pos = self.rect.topleft
-        
-    def do_movement_step(self):
-        self.do_gravity()
-        self.rect.y += self.direction.y
-        self.rect.x += self.direction.x * self.speed
-        self.pos = self.rect.topleft
         
     def jump(self):
         self.direction.y = -12
         self.on_ground = False
-    
-    def do_gravity(self):
-        if not self.on_ladder:
-            self.direction.y += self.gravity
             
-    def do_gravity_old(self):
+    def do_gravity(self):
         if not self.on_ladder:
             self.direction.y += self.gravity
             self.rect.y += self.direction.y
             self.pos = self.rect.topleft
     
-    def add_inventory(self, name, image):
-        self.inventory.append((name, image))
-    
     def update(self):
-        
-        self.get_input()
-        self.do_movement_step()
-        #self.do_gravity()
+        if not self.movement_lockout.active:
+            self.get_input()
+           # self.do_movement_step()
+        self.movement_lockout.update()
+        self.do_gravity()
         self.animate()
         self.show_hitboxes()

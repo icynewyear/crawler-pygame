@@ -6,10 +6,12 @@ level_0 = {
     'waterfalls': 'data/level0/level0._waterfalls.csv',
     'enemies': 'data/level0/level0._enemies.csv',
     'doors': 'data/level0/level0._doors.csv',
-    'items': 'data/level0/level0._items.csv',
+    'coins': 'data/level0/level0._coins.csv',
     'chests': 'data/level0/level0._chests.csv',
+    'constraints': 'data/level0/level0._constraints.csv',
 }
 
 levels = {
     0: level_0
 }
+

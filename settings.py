@@ -1,4 +1,5 @@
-DEBUG = True
+DEBUG = False
+COLOR = False
 
 # screen
 SCREEN_WIDTH = 960
@@ -18,3 +19,5 @@ RED = (255,0,0)
 ORANGE = (255, 165, 0)
 GREY = (128, 128, 128)
 BROWN = (165, 42, 42)
+WHITE = (255, 255, 255)
+PURPLE = (128, 0, 128)

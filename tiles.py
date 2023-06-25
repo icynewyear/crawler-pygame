@@ -56,13 +56,31 @@ class Coin(AnimatedTile):
         
 class Door(StaticTile):
     def __init__(self, pos, state = 'closed'):
-        image = pygame.image.load('graphics/door/'+ state + '.png').convert_alpha()
-        surface = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
-        super().__init__(pos, TILE_SIZE, surface)
+        self.state = state
+        self.image = pygame.image.load('graphics/door/'+ state + '.png').convert_alpha()
+        self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        super().__init__(pos, TILE_SIZE, self.surface)
+        
+    def interact(self, player):
+        if player.check_item_in_inventory('key') and self.state == 'closed':
+            self.image = pygame.image.load('graphics/door/open.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+            self.state = 'open'
+            player.remove_inventory('key')
 
 class Chest(StaticTile):
-    def __init__(self, pos, state = 'closed'):
-        image = pygame.image.load('graphics/chest/'+ state + '.png').convert_alpha()
-        surface = pygame.transform.scale(image, (TILE_SIZE, TILE_SIZE))
-        super().__init__(pos, TILE_SIZE, surface)
+    def __init__(self, pos, contents, state = 'closed'):
+        #contents is ('name', image)
+        self.contents = contents
+        self.state = state
+        self.image = pygame.image.load('graphics/chest/'+ state + '.png').convert_alpha()
+        self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        super().__init__(pos, TILE_SIZE, self.surface)
     
+    def interact(self, player):
+        if self.state == 'closed':
+            self.image = pygame.image.load('graphics/chest/open.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+            player.add_inventory(self.contents[0], self.contents[1])
+            self.state = 'open'
+        

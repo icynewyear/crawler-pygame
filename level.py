@@ -49,16 +49,19 @@ class Level:
         self.chest_layout = import_csv_layout(self.level_data['chests'])
         self.chest_tiles = self.create_tile_group(self.chest_layout, 'chests')
         
-        #items
-        self.item_layout = import_csv_layout(self.level_data['items'])
-        self.item_tiles = self.create_tile_group(self.item_layout, 'items')
+        #coins
+        self.coin_layout = import_csv_layout(self.level_data['coins'])
+        self.coin_tiles = self.create_tile_group(self.coin_layout, 'coins')
         
         #enemeies
         self.enemies_layout = import_csv_layout(self.level_data['enemies'])
         self.enemies = self.create_tile_group(self.enemies_layout, 'enemies')
+        #constraints
+        self.constraint_layout = import_csv_layout(self.level_data['constraints'])
+        self.constraints = self.create_tile_group(self.constraint_layout, 'constraints')
         
         #collisons
-        self.collision_sprites = self.terrain_tiles.sprites()
+        self.collision_sprites = self.terrain_tiles.sprites() + self.bridge_tiles.sprites()
         
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -83,7 +86,7 @@ class Level:
                         tile = StaticTile((x,y), TILE_SIZE, pygame.transform.scale(tile_surface, (TILE_SIZE, TILE_SIZE)))
                         
                     if tile_type == 'player':
-                        tile = Player((x,y))
+                        tile = Player((x,y),self.check_for_interaction)
                         self.player = tile
                         
                     if tile_type == 'waterfalls':
@@ -113,14 +116,25 @@ class Level:
                         tile = Door((x,y), state)
                         
                     if tile_type == 'chests':
-                        if col == '2': state = 'open' 
-                        else: state = 'closed'
-                        tile = Chest((x,y), state)
+                        if col == '1':
+                            contents = ('sword', pygame.image.load('graphics/unsorted/sword_a.png').convert_alpha())
+                        if col == '2':
+                            contents = ('shield', pygame.image.load('graphics/unsorted/shield_a.png').convert_alpha())  
+                        if col == '3':
+                            contents = ('boots', pygame.image.load('graphics/unsorted/boots_a.png').convert_alpha())
+                        if col == '4':
+                            contents = ('orb', pygame.image.load('graphics/unsorted/orb_a.png').convert_alpha())
+                        if col == '5':
+                            contents = ('key', pygame.image.load('graphics/unsorted/key_a.png').convert_alpha())
+                        tile = Chest((x,y), contents)
                     
-                    if tile_type == 'items':
+                    if tile_type == 'coins':
                         if col == '1':
                             tile = Coin((x,y))
-                        
+                    
+                    if tile_type == 'constraints':
+                        if col == '1':
+                            tile = Tile((x,y), TILE_SIZE)
                       
                     group.add(tile)
         return group
@@ -141,7 +155,6 @@ class Level:
     
     def vertical_movement_collision(self):
         player = self.player
-        debug(player.inventory[0][0], (80,80))
        # if not player.on_ladder: player.do_gravity()
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(player.rect):
@@ -166,7 +179,24 @@ class Level:
                 return True
             else:
                 player.on_ladder = False
-            
+    
+    def check_for_interaction(self):
+        player = self.player
+        interactables = self.door_tiles.sprites() + self.chest_tiles.sprites()
+        for sprite in self.door_tiles:
+            if sprite.rect.colliderect(player.rect):
+                sprite.interact(player)
+        for sprite in self.chest_tiles:
+            if sprite.rect.colliderect(player.rect):
+                sprite.interact(player)
+    
+    def check_coin_collision(self):
+        player = self.player
+        for sprite in self.coin_tiles:
+            if sprite.rect.colliderect(player.rect):
+                sprite.kill()
+                player.coins += 1
+          
     def run(self, dt):
         self.screen.fill(BG_COLOR)
        
@@ -195,8 +225,8 @@ class Level:
         self.chest_tiles.draw(self.screen)
         
         #items
-        self.item_tiles.update()
-        self.item_tiles.draw(self.screen)
+        self.coin_tiles.update()
+        self.coin_tiles.draw(self.screen)
         
         #enemies
         self.enemies.update()
@@ -208,6 +238,7 @@ class Level:
         self.ladder_collision()
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
+        self.check_coin_collision()
         
         self.player_sprites.update() 
         self.player_sprites.draw(self.screen)
