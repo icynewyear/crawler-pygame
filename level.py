@@ -62,6 +62,7 @@ class Level:
         
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites() + self.bridge_tiles.sprites()
+        self.player.collision_sprites = self.collision_sprites
         
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -89,6 +90,7 @@ class Level:
                         tile = Player((x,y),self.check_for_interaction)
                         self.player = tile
                         
+                        
                     if tile_type == 'waterfalls':
                         if col == '4':
                             tile = Waterfall((x,y), TILE_SIZE, 'top')
@@ -108,7 +110,7 @@ class Level:
                             tile = Waterfall((x,y), TILE_SIZE, 'water', True)
                      
                     if tile_type == 'enemies':
-                        tile = Enemy((x,y), col)  
+                        tile = Enemy((x,y), self.check_enemy_constraints, col)  
                     
                     if tile_type == 'doors':
                         if col == '2': state = 'open' 
@@ -190,16 +192,24 @@ class Level:
             if sprite.rect.colliderect(player.rect):
                 sprite.interact(player)
     
+    def check_enemy_constraints(self, rect):
+        for sprite in self.constraints:
+            if sprite.rect.colliderect(rect):
+                return True
+        return False
+    
     def check_coin_collision(self):
         player = self.player
         for sprite in self.coin_tiles:
             if sprite.rect.colliderect(player.rect):
                 sprite.kill()
                 player.coins += 1
-          
+         
     def run(self, dt):
         self.screen.fill(BG_COLOR)
-       
+        
+        debug(self.player.rect.y, (80,80))
+        
         #terrain
         self.terrain_tiles.update()
         self.terrain_tiles.draw(self.screen)
@@ -228,18 +238,23 @@ class Level:
         self.coin_tiles.update()
         self.coin_tiles.draw(self.screen)
         
-        #enemies
-        self.enemies.update()
-        self.enemies.draw(self.screen)
-        
-        #Player
-        
-        
+        #Player Collisions
         self.ladder_collision()
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
         self.check_coin_collision()
         
+        #player movement check 
+        if self.player.step():
+            #anything that is turn based goes here
+            for enemy in self.enemies:
+                enemy.step()
+        
+        #enemies animation and draw
+        self.enemies.update()
+        self.enemies.draw(self.screen)
+        
+        #player animation and draw       
         self.player_sprites.update() 
         self.player_sprites.draw(self.screen)
         
