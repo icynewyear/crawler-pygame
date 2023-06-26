@@ -30,6 +30,7 @@ class Player(pygame.sprite.Sprite):
         #collisio
         self.last_direction = None
         self.on_ladder = False
+        self.collision_sprites = None
         
         # player status
         self.facing_right = True
@@ -88,14 +89,20 @@ class Player(pygame.sprite.Sprite):
         
         #left and right
         if keys[pygame.K_LEFT]:
-            self.rect.x -= self.speed
-            self.facing = 'left'
-            step = True
+            new_rect = self.rect.copy()
+            new_rect.x -= self.speed
+            if not self.check_collisions(new_rect):
+                self.rect.x -= self.speed
+                self.facing = 'left'
+                step = True
         elif keys[pygame.K_RIGHT]:
-            self.rect.x += self.speed
-            self.facing = 'right'
-            step = True
-        self.pos = self.rect.topleft
+            new_rect = self.rect.copy()
+            new_rect.x += self.speed
+            if not self.check_collisions(new_rect):
+                self.rect.x += self.speed
+                self.facing = 'right'
+                step = True
+        if step: self.pos = self.rect.topleft
             
         #ladder  
         if keys[pygame.K_UP] and self.on_ladder:
@@ -115,11 +122,17 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and self.check_item_in_inventory('boots'):
             if self.on_ground:
                 self.jump()
-                
+        print(step)      
         if step: 
             self.movement_lockout.start()
         return step
-                    
+    
+    def check_collisions(self, rect):
+        for sprite in self.collision_sprites:
+            if sprite.rect.colliderect(rect):
+                return True
+        return False   
+                
     def get_hitbox_from_image(self, surf):
         image_mask = pygame.mask.from_surface(surf)
         rect_list = image_mask.get_bounding_rects()
@@ -141,11 +154,13 @@ class Player(pygame.sprite.Sprite):
             self.direction.y += self.gravity
             self.rect.y += self.direction.y
             self.pos = self.rect.topleft
-    
+            
+    def step(self):
+        if self.movement_lockout.active:
+            return False
+        return self.get_input()
+                
     def update(self):
-        if not self.movement_lockout.active:
-            self.get_input()
-           # self.do_movement_step()
         self.movement_lockout.update()
         self.do_gravity()
         self.animate()
