@@ -45,10 +45,10 @@ class Player(pygame.sprite.Sprite):
         self.coins = 0
         self.lives = 3
         self.inventory = []
+        #self.inventory_test()
 
     def inventory_test(self):
-        #self.add_inventory(SWORD)
-        pass
+        self.add_inventory(BOOTS)
        
     def check_item_in_inventory(self, item):
         for i in self.inventory:

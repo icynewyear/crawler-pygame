@@ -35,6 +35,10 @@ class Level:
         self.ladder_layout = import_csv_layout(self.level_data['ladders'])
         self.ladder_tiles = self.create_tile_group(self.ladder_layout, 'ladders')
         
+        #spikes
+        self.spike_layout = import_csv_layout(self.level_data['spikes'])
+        self.spike_tiles = self.create_tile_group(self.spike_layout, 'spikes')
+        
         #bridges
         self.bridge_layout = import_csv_layout(self.level_data['bridges'])
         self.bridge_tiles = self.create_tile_group(self.bridge_layout, 'bridges')
@@ -62,6 +66,7 @@ class Level:
         #enemeies
         self.enemies_layout = import_csv_layout(self.level_data['enemies'])
         self.enemies = self.create_tile_group(self.enemies_layout, 'enemies')
+        
         #constraints
         self.constraint_layout = import_csv_layout(self.level_data['constraints'])
         self.constraints = self.create_tile_group(self.constraint_layout, 'constraints')
@@ -91,6 +96,9 @@ class Level:
                         terrain_tile_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
                         tile_surface = terrain_tile_list[int(col)]
                         tile = StaticTile((x,y), TILE_SIZE, pygame.transform.scale(tile_surface, (TILE_SIZE, TILE_SIZE)))
+                    
+                    if tile_type == 'spikes':
+                        tile = Spikke((x,y), int(col))
                         
                     if tile_type == 'player':
                         tile = Player((x,y),self.check_for_interaction)
@@ -175,7 +183,8 @@ class Level:
     
     def vertical_movement_collision(self):
         player = self.player
-       # if not player.on_ladder: player.do_gravity()
+        boots = player.check_item_in_inventory('boots')
+        if boots: self.collision_sprites += self.spike_tiles.sprites()
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.y < 0:
@@ -194,16 +203,23 @@ class Level:
     def ladder_collision(self):
         player = self.player
         ladder_check = self.ladder_tiles.sprites()
+        waterfall_check = [spr for spr in self.waterfall_tiles.sprites() if spr.type != 'water']        
+        orb = player.check_item_in_inventory('orb')
         
-        if player.check_item_in_inventory('orb'):
-    
-            ladder_check = ladder_check + self.waterfall_tiles.sprites()
-        for sprite in ladder_check:
+        for sprite in self.ladder_tiles.sprites():
             if sprite.rect.colliderect(player.rect):
                 player.on_ladder = True
                 return True
             else:
                 player.on_ladder = False
+        if orb:
+            for sprite in waterfall_check:
+                if sprite.rect.colliderect(player.rect):
+                    sprite.freeze()
+                    player.on_ladder = True
+                    return True
+                else:
+                    player.on_ladder = False    
     
     def check_for_interaction(self):
         player = self.player
@@ -235,6 +251,14 @@ class Level:
                 sprite.kill()
                 player.add_inventory(sprite.item)   
     
+    def check_spike_collison(self):
+        player = self.player
+        for sprite in self.spike_tiles:
+            if sprite.rect.colliderect(player.rect):
+                player.kill()
+                sprite.bleed()
+                self.gameover = True
+    
     def check_enemey_collsion(self):
         player = self.player
         sword = player.check_item_in_inventory('sword')
@@ -242,7 +266,7 @@ class Level:
         for sprite in self.enemies:
             if sprite.rect.colliderect(player.rect):
                 if sword:
-                    if shield:
+                    if shield and player.facing != sprite.facing:
                         sprite.kill()
                     else:
                         player.current_health -= 1
@@ -262,9 +286,14 @@ class Level:
         self.terrain_tiles.update()
         self.terrain_tiles.draw(self.screen)
         
+        #spikes
+        self.spike_tiles.update()
+        self.spike_tiles.draw(self.screen)
+        
         #ladders
         self.ladder_tiles.update()
         self.ladder_tiles.draw(self.screen)
+        
         
         #bridges
         self.bridge_tiles.update()
@@ -299,6 +328,7 @@ class Level:
         
         self.check_coin_collision()
         self.check_item_collision()
+        self.check_spike_collison()
         
         #player movement check 
         if self.player.step() and not self.gameover:

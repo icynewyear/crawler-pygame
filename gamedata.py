@@ -10,6 +10,7 @@ level_0 = {
     'chests': 'data/level0/level0._chests.csv',
     'constraints': 'data/level0/level0._constraints.csv',
     'items': 'data/level0/level0._items.csv',
+    'spikes': 'data/level0/level0._spikes.csv',
 }
 
 levels = {

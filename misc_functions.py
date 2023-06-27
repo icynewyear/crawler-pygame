@@ -46,3 +46,17 @@ def import_cut_graphics(path):
             tiles.append(new_surface)
 
     return tiles
+
+def tint_icon(icon, tint_color):
+    for x in range(icon.get_width()):
+        for y in range(icon.get_height()):
+            color = icon.get_at((x,y))
+            
+            new_color = (
+                min(color[0] * tint_color[0] // 255, 255),
+                min(color[1] * tint_color[1] // 255, 255),
+                min(color[2] * tint_color[2] // 255, 255),
+                color[3]
+            )
+            icon.set_at((x,y), new_color)
+    return icon

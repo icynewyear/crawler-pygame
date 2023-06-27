@@ -1,6 +1,6 @@
 import pygame
 from settings import *
-from misc_functions import import_folder
+from misc_functions import import_folder, import_cut_graphics, tint_icon
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, size):
@@ -34,7 +34,9 @@ class AnimatedTile(Tile):
         
 class Waterfall(AnimatedTile):
     def __init__(self, pos, size, type = 'middle', inverted = False):
-        path = 'graphics/terrain/waterfall/'+ type
+        self.type = type
+        self.frozen = False
+        path = 'graphics/terrain/waterfall/'+ self.type
         frames = import_folder(path)
         
         if inverted:
@@ -46,6 +48,16 @@ class Waterfall(AnimatedTile):
                 
         super().__init__(pos, size, frames)
 
+    def freeze(self):
+        self.frozen = True
+        self.animation_speed = 0
+        new_frame = tint_icon(self.frames[0], LIGHT_BLUE)
+        self.image = pygame.transform.scale(new_frame, (TILE_SIZE, TILE_SIZE))
+    
+    def animate(self):
+        if not self.frozen:
+            super().animate()
+        
 class Coin(AnimatedTile):
     def __init__(self, pos):
         path = 'graphics/coin'
@@ -83,6 +95,18 @@ class Chest(StaticTile):
             player.add_inventory(self.contents)
             self.state = 'open'
 
+class Spikke(StaticTile):
+    def __init__(self, pos, type):
+        terrain_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
+        self.image = pygame.transform.flip(terrain_list[type], False, True)
+        self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        super().__init__(pos, TILE_SIZE, self.surface)
+    
+    def bleed(self):
+        self.image = tint_icon(self.image, RED)
+        self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        
+    
 class ItemIcon(StaticTile):
     def __init__(self, pos, item):
         self.item = item
