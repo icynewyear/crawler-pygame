@@ -4,6 +4,7 @@ from misc_functions import *
 from debug import *
 from timer import Timer
 from gamedata import *
+from items import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, check_for_interaction):
@@ -18,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         
         #combat
         self.max_health = 3
-        self.current_health = self.max_health
+        self.current_health = 3
         
         #image and animation
         self.frames = import_folder('graphics/player/walk')
@@ -44,21 +45,12 @@ class Player(pygame.sprite.Sprite):
         self.coins = 0
         self.lives = 3
         self.inventory = []
-       # self.inventory_test()
+        self.inventory_test()
 
     def inventory_test(self):
-        item = pygame.image.load('graphics/unsorted/sword_a.png').convert_alpha()
-        self.add_inventory('sword', item)
-        item = pygame.image.load('graphics/unsorted/shield_a.png').convert_alpha()
-        self.add_inventory('shield', item)
-        item = pygame.image.load('graphics/unsorted/boots_a.png').convert_alpha()
-        self.add_inventory('boots', item)
-        item = pygame.image.load('graphics/unsorted/orb_a.png').convert_alpha()
-        self.add_inventory('orb', item)
-        item = pygame.image.load('graphics/unsorted/key_a.png').convert_alpha()
-        self.add_inventory('key', item)
-        
-        self.current_health = 1
+        #self.add_inventory(SWORD)
+        pass
+       
 
     def check_item_in_inventory(self, item):
         for i in self.inventory:
@@ -66,7 +58,10 @@ class Player(pygame.sprite.Sprite):
                 return True
         return False
     
-    def add_inventory(self, name, image):
+    def add_inventory(self, item):
+        #takes a tuple of (name, imagepath)
+        name = item[0]
+        image = pygame.image.load(item[1]).convert_alpha()
         self.inventory.append((name, image))
     
     def remove_inventory(self, item):
@@ -121,8 +116,7 @@ class Player(pygame.sprite.Sprite):
         #jump (Neeeds rework)    
         if keys[pygame.K_SPACE] and self.check_item_in_inventory('boots'):
             if self.on_ground:
-                self.jump()
-        print(step)      
+                self.jump()  
         if step: 
             self.movement_lockout.start()
         return step

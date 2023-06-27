@@ -16,9 +16,11 @@ class UI:
     
     def display_health(self):
         for index in range(self.player.max_health):
+            print(index)
+            print(self.player.current_health)
             heart = pygame.image.load('graphics/unsorted/heart_a.png').convert_alpha()
             #if COLOR:
-            if index < self.player.current_health:
+            if index  < self.player.current_health:
                 heart = self.tint_icon(heart, RED)
             # if not COLOR:
             #     if index > self.player.current_health:

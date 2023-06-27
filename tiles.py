@@ -52,8 +52,7 @@ class Coin(AnimatedTile):
         frames = import_folder(path)
         super().__init__(pos, TILE_SIZE, frames)
         self.animation_speed = .1
-        
-        
+                
 class Door(StaticTile):
     def __init__(self, pos, state = 'closed'):
         self.state = state
@@ -81,6 +80,13 @@ class Chest(StaticTile):
         if self.state == 'closed':
             self.image = pygame.image.load('graphics/chest/open.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
-            player.add_inventory(self.contents[0], self.contents[1])
+            player.add_inventory(self.contents)
             self.state = 'open'
-        
+
+class ItemIcon(StaticTile):
+    def __init__(self, pos, item):
+        self.item = item
+        self.image = pygame.image.load(item[1]).convert_alpha()
+        self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        super().__init__(pos, TILE_SIZE, self.surface)
+    

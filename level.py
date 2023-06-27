@@ -6,6 +6,7 @@ from tiles import *
 from enemies import Enemy
 from misc_functions import *
 from gamedata import levels
+from items import *
 
 from debug import debug
 
@@ -52,6 +53,10 @@ class Level:
         #coins
         self.coin_layout = import_csv_layout(self.level_data['coins'])
         self.coin_tiles = self.create_tile_group(self.coin_layout, 'coins')
+        
+        #items
+        self.item_layout = import_csv_layout(self.level_data['items'])
+        self.item_tiles = self.create_tile_group(self.item_layout, 'items')
         
         #enemeies
         self.enemies_layout = import_csv_layout(self.level_data['enemies'])
@@ -119,20 +124,32 @@ class Level:
                         
                     if tile_type == 'chests':
                         if col == '1':
-                            contents = ('sword', pygame.image.load('graphics/unsorted/sword_a.png').convert_alpha())
+                            contents = SWORD
                         if col == '2':
-                            contents = ('shield', pygame.image.load('graphics/unsorted/shield_a.png').convert_alpha())  
+                            contents = SHIELD
                         if col == '3':
-                            contents = ('boots', pygame.image.load('graphics/unsorted/boots_a.png').convert_alpha())
+                            contents = BOOTS
                         if col == '4':
-                            contents = ('orb', pygame.image.load('graphics/unsorted/orb_a.png').convert_alpha())
+                            contents = ORB
                         if col == '5':
-                            contents = ('key', pygame.image.load('graphics/unsorted/key_a.png').convert_alpha())
+                            contents = KEY
                         tile = Chest((x,y), contents)
                     
                     if tile_type == 'coins':
                         if col == '1':
                             tile = Coin((x,y))
+                            
+                    if tile_type == 'items':
+                        if col == '1':
+                            tile = ItemIcon((x,y), SWORD)
+                        if col == '2':
+                            tile = ItemIcon((x,y), SHIELD)
+                        if col == '3':
+                            tile = ItemIcon((x,y), BOOTS)
+                        if col == '4':
+                            tile = ItemIcon((x,y), ORB)
+                        if col == '5':
+                            tile = ItemIcon((x,y), KEY)
                     
                     if tile_type == 'constraints':
                         if col == '1':
@@ -197,18 +214,44 @@ class Level:
             if sprite.rect.colliderect(rect):
                 return True
         return False
-    
+     
     def check_coin_collision(self):
         player = self.player
         for sprite in self.coin_tiles:
             if sprite.rect.colliderect(player.rect):
                 sprite.kill()
                 player.coins += 1
+    
+    def check_item_collision(self):
+        player = self.player
+        for sprite in self.item_tiles:
+            if sprite.rect.colliderect(player.rect):
+                sprite.kill()
+                player.add_inventory(sprite.item)   
+    
+    def check_enemey_collsion(self):
+        player = self.player
+        sword = player.check_item_in_inventory('sword')
+        shield = player.check_item_in_inventory('shield')
+        for sprite in self.enemies:
+            if sprite.rect.colliderect(player.rect):
+                if sword:
+                    print('sword')
+                    if shield:
+                        sprite.kill()
+                    else:
+                        player.current_health -= 1
+                        sprite.kill()
+                else:
+                    player.current_health -= 1
+    
+                if player.current_health <= 0:
+                    player.kill()
+                    #self.ui.game_over() 
          
     def run(self, dt):
         self.screen.fill(BG_COLOR)
         
-        debug(self.player.rect.y, (80,80))
         
         #terrain
         self.terrain_tiles.update()
@@ -234,21 +277,31 @@ class Level:
         self.chest_tiles.update()
         self.chest_tiles.draw(self.screen)
         
-        #items
+        #coins
         self.coin_tiles.update()
         self.coin_tiles.draw(self.screen)
         
+        #items
+        self.item_tiles.update()
+        self.item_tiles.draw(self.screen)
+    
         #Player Collisions
         self.ladder_collision()
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
+        
+        #collisions
+        
         self.check_coin_collision()
+        self.check_item_collision()
         
         #player movement check 
         if self.player.step():
             #anything that is turn based goes here
             for enemy in self.enemies:
                 enemy.step()
+                self.check_enemey_collsion()
+                
         
         #enemies animation and draw
         self.enemies.update()
