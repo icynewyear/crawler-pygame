@@ -45,13 +45,11 @@ class Player(pygame.sprite.Sprite):
         self.coins = 0
         self.lives = 3
         self.inventory = []
-        self.inventory_test()
 
     def inventory_test(self):
         #self.add_inventory(SWORD)
         pass
        
-
     def check_item_in_inventory(self, item):
         for i in self.inventory:
             if i[0] == item:
@@ -70,6 +68,10 @@ class Player(pygame.sprite.Sprite):
                 self.inventory.remove(i)
     
     def animate(self):
+        if self.on_ladder:
+            self.frames = import_folder('graphics/player/climb')
+        else:
+            self.frames = import_folder('graphics/player/walk')
         self.frame_index += self.animation_speed
         if self.frame_index >= len(self.frames):
             self.frame_index = 0

@@ -16,8 +16,6 @@ class UI:
     
     def display_health(self):
         for index in range(self.player.max_health):
-            print(index)
-            print(self.player.current_health)
             heart = pygame.image.load('graphics/unsorted/heart_a.png').convert_alpha()
             #if COLOR:
             if index  < self.player.current_health:
@@ -58,6 +56,12 @@ class UI:
         surf = self.font.render(coins, True, WHITE)
         self.screen.blit(surf, (515,640))
     
+    def display_game_over(self):
+        surf = self.font.render('GAME OVER', True, WHITE)
+        self.screen.blit(surf, (SCREEN_WIDTH//2 - surf.get_width()//2, SCREEN_HEIGHT//2 - surf.get_height()//2))
+        self.screen.blit(surf, ((SCREEN_WIDTH//2 - surf.get_width()//2)-2, (SCREEN_HEIGHT//2 - surf.get_height()//2)-2))
+        self.screen.blit(surf, (SCREEN_WIDTH//2 - surf.get_width()//2, SCREEN_HEIGHT//2 - surf.get_height()//2))
+        
     def tint_icon(self, icon, tint_color):
         for x in range(icon.get_width()):
             for y in range(icon.get_height()):

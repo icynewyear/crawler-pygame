@@ -13,6 +13,7 @@ from debug import debug
 class Level:
     def __init__(self, screen):
         self.screen = screen
+        self.gameover = False
         
         
         #player
@@ -192,7 +193,12 @@ class Level:
 
     def ladder_collision(self):
         player = self.player
-        for sprite in self.ladder_tiles:
+        ladder_check = self.ladder_tiles.sprites()
+        
+        if player.check_item_in_inventory('orb'):
+    
+            ladder_check = ladder_check + self.waterfall_tiles.sprites()
+        for sprite in ladder_check:
             if sprite.rect.colliderect(player.rect):
                 player.on_ladder = True
                 return True
@@ -236,7 +242,6 @@ class Level:
         for sprite in self.enemies:
             if sprite.rect.colliderect(player.rect):
                 if sword:
-                    print('sword')
                     if shield:
                         sprite.kill()
                     else:
@@ -247,7 +252,7 @@ class Level:
     
                 if player.current_health <= 0:
                     player.kill()
-                    #self.ui.game_over() 
+                    self.gameover = True 
          
     def run(self, dt):
         self.screen.fill(BG_COLOR)
@@ -296,7 +301,7 @@ class Level:
         self.check_item_collision()
         
         #player movement check 
-        if self.player.step():
+        if self.player.step() and not self.gameover:
             #anything that is turn based goes here
             for enemy in self.enemies:
                 enemy.step()
@@ -312,3 +317,5 @@ class Level:
         self.player_sprites.draw(self.screen)
         
         self.ui.run()
+        if self.gameover:
+            self.ui.display_game_over()
