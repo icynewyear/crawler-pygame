@@ -36,6 +36,7 @@ class Waterfall(AnimatedTile):
     def __init__(self, pos, size, type = 'middle', inverted = False):
         self.type = type
         self.frozen = False
+        
         path = 'graphics/terrain/waterfall/'+ self.type
         frames = import_folder(path)
         
@@ -48,6 +49,13 @@ class Waterfall(AnimatedTile):
                 
         super().__init__(pos, size, frames)
 
+    def bleed(self):
+        new_surf_list = []
+        for frame in self.frames:
+            new_frame = tint_icon(frame, RED)
+            new_surf_list.append(new_frame)
+        self.frames = new_surf_list
+    
     def freeze(self):
         self.frozen = True
         self.animation_speed = 0

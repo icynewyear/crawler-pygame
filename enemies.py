@@ -2,7 +2,7 @@ import pygame
 from debug import debug
 
 from settings import *
-from misc_functions import import_folder
+from misc_functions import import_folder, tint_icon
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, check_enemy_constraints, type = '1'):
@@ -19,11 +19,15 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft = self.pos)
         
+        self.bleed = False
+        
     def animate(self):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
-        self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
+        frame = self.frames[int(self.frame_index)]
+        if self.bleed: frame = tint_icon(frame, RED)
+        self.image = pygame.transform.scale(frame, (TILE_SIZE, TILE_SIZE))
         if self.facing == 'right':
             self.image = pygame.transform.flip(self.image, True, False)
      

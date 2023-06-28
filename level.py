@@ -103,8 +103,7 @@ class Level:
                     if tile_type == 'player':
                         tile = Player((x,y),self.check_for_interaction)
                         self.player = tile
-                        
-                        
+                          
                     if tile_type == 'waterfalls':
                         if col == '4':
                             tile = Waterfall((x,y), TILE_SIZE, 'top')
@@ -201,9 +200,8 @@ class Level:
             player.on_ground = False
 
     def ladder_collision(self):
-        player = self.player
-        ladder_check = self.ladder_tiles.sprites()
-        waterfall_check = [spr for spr in self.waterfall_tiles.sprites() if spr.type != 'water']        
+        player = self.player     
+        waterfall_check = self.waterfall_tiles.sprites()
         orb = player.check_item_in_inventory('orb')
         
         for sprite in self.ladder_tiles.sprites():
@@ -255,10 +253,21 @@ class Level:
         player = self.player
         for sprite in self.spike_tiles:
             if sprite.rect.colliderect(player.rect):
-                player.kill()
+                player.current_health = 0
                 sprite.bleed()
                 self.gameover = True
-    
+                
+    def check_water_collisons(self):
+        player = self.player
+        orb = player.check_item_in_inventory('orb')
+        if not orb:
+            for sprite in self.waterfall_tiles:
+                if sprite.type == 'water' or sprite.type == 'bottom':
+                    if sprite.rect.colliderect(player.rect):
+                        player.current_health = 0
+                        sprite.bleed()
+                        self.gameover = True
+                
     def check_enemey_collsion(self):
         player = self.player
         sword = player.check_item_in_inventory('sword')
@@ -275,7 +284,8 @@ class Level:
                     player.current_health -= 1
     
                 if player.current_health <= 0:
-                    player.kill()
+                    sprite.bleed = True
+                    self.collision_sprites = []
                     self.gameover = True 
          
     def run(self, dt):
@@ -329,6 +339,7 @@ class Level:
         self.check_coin_collision()
         self.check_item_collision()
         self.check_spike_collison()
+        self.check_water_collisons()
         
         #player movement check 
         if self.player.step() and not self.gameover:

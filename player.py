@@ -160,4 +160,4 @@ class Player(pygame.sprite.Sprite):
         self.movement_lockout.update()
         self.do_gravity()
         self.animate()
-        self.show_hitboxes()
+        if DEBUG: self.show_hitboxes()

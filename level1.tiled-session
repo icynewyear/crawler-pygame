@@ -1,4 +1,5 @@
 {
+    "activeFile": "",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -9,6 +10,10 @@
                 "x": 46.24337255916204,
                 "y": 34.682529419371534
             }
+        },
+        "tiles/alphaBG_tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 6.4856
         },
         "tiles/blackBG_tileset.tsx": {
             "scaleInDock": 1,
@@ -35,12 +40,15 @@
             "scaleInEditor": 1
         }
     },
+    "last.imagePath": "C:/Users/antho/Downloads/1bit doungeon platformer/1bit doungeon platformer",
     "openFiles": [
         "tiles/tileset.tsx",
         "levels/level0.tmx",
         "tiles/character_b.tsx"
     ],
+    "project": "",
     "recentFiles": [
+        "tiles/alphaBG_tileset.tsx",
         "tiles/tileset.tsx",
         "tiles/character_b.tsx",
         "levels/level0.tmx",
@@ -48,5 +56,10 @@
         "tiles/tileset_b.tsx",
         "tiles/caves.tsx",
         "tiles/props1.tsx"
-    ]
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
 }
