@@ -9,7 +9,8 @@ class UI:
         self.player = player
         self.screen = pygame.display.get_surface()
         self.font = pygame.font.Font('graphics/ARCADECLASSIC.ttf', 64)
-            
+        self.gameover_font = pygame.font.Font('graphics/ARCADECLASSIC.ttf', 128)
+        
     def display_inventory(self):
         for index, item in enumerate(self.player.inventory):
             display_item = pygame.transform.scale(item[1], (64, 64))
@@ -63,7 +64,7 @@ class UI:
                 color = BLACK
             else:
                 color = WHITE
-            surf = self.font.render('GAME OVER', True, color)
+            surf = self.gameover_font.render('GAME OVER', True, color)
             self.screen.blit(surf, ((SCREEN_WIDTH//2 - surf.get_width()//2) - i, (SCREEN_HEIGHT//2 - surf.get_height()//2) - i))
     
     def run(self):
