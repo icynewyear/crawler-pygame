@@ -1,5 +1,5 @@
 {
-    "activeFile": "",
+    "activeFile": "tiles/blackBG_tileset.tsx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -7,8 +7,8 @@
             "scale": 6.444166666666666,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 46.24337255916204,
-                "y": 34.682529419371534
+                "x": 59.89913358334412,
+                "y": 40.11379800853485
             }
         },
         "tiles/alphaBG_tileset.tsx": {
@@ -17,7 +17,7 @@
         },
         "tiles/blackBG_tileset.tsx": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 5.9479
         },
         "tiles/caves.tsx": {
             "scaleInDock": 0.25,
@@ -44,15 +44,16 @@
     "openFiles": [
         "tiles/tileset.tsx",
         "levels/level0.tmx",
-        "tiles/character_b.tsx"
+        "tiles/character_b.tsx",
+        "tiles/blackBG_tileset.tsx"
     ],
     "project": "",
     "recentFiles": [
-        "tiles/alphaBG_tileset.tsx",
         "tiles/tileset.tsx",
-        "tiles/character_b.tsx",
         "levels/level0.tmx",
+        "tiles/character_b.tsx",
         "tiles/blackBG_tileset.tsx",
+        "tiles/alphaBG_tileset.tsx",
         "tiles/tileset_b.tsx",
         "tiles/caves.tsx",
         "tiles/props1.tsx"

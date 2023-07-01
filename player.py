@@ -11,11 +11,12 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         #pos and movement
         self.pos = pos
+        self.grid = pygame.math.Vector2(pos[0] // TILE_SIZE, pos[1] // TILE_SIZE)
         self.facing = 'right'
         self.direction = pygame.math.Vector2(0, 0)
         self.speed = 64
         self.gravity = .6
-        self.movement_lockout = Timer(300)
+        self.movement_lockout = Timer(250)
         
         #combat
         self.max_health = 3
@@ -27,6 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = .05
         self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft = self.pos)
+        
 
         #collisio
         self.last_direction = None
@@ -89,6 +91,7 @@ class Player(pygame.sprite.Sprite):
             new_rect = self.rect.copy()
             new_rect.x -= self.speed
             if not self.check_collisions(new_rect):
+                self.grid -= (-1, 0)
                 self.rect.x -= self.speed
                 self.facing = 'left'
                 step = True
@@ -96,6 +99,7 @@ class Player(pygame.sprite.Sprite):
             new_rect = self.rect.copy()
             new_rect.x += self.speed
             if not self.check_collisions(new_rect):
+                self.grid += (1, 0)
                 self.rect.x += self.speed
                 self.facing = 'right'
                 step = True
@@ -114,21 +118,18 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_e]:
             self.check_for_interaction()
             step = False
-            
-        #jump (Neeeds rework)    
-        if keys[pygame.K_SPACE] and self.check_item_in_inventory('boots'):
-            if self.on_ground:
-                self.jump()  
+        
         if step: 
             self.movement_lockout.start()
         return step
     
-    def check_collisions(self, rect):
+    def check_collisions(self, rect, return_sprite = False):
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(rect):
+                if return_sprite: return sprite
                 return True
         return False   
-                
+               
     def get_hitbox_from_image(self, surf):
         image_mask = pygame.mask.from_surface(surf)
         rect_list = image_mask.get_bounding_rects()
@@ -146,11 +147,36 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = False
             
     def do_gravity(self):
+        new_rect = self.rect.copy()
+        new_rect.y += self.gravity
+        collison_sprite = None
+        
+        collison_sprite = self.check_collisions(new_rect)
         if not self.on_ladder:
-            self.direction.y += self.gravity
-            self.rect.y += self.direction.y
-            self.pos = self.rect.topleft
             
+            if collison_sprite != False:
+                if self.direction.y > 0:
+                    self.rect.bottom = collison_sprite.rect.top
+                    self.on_ground = True
+                    self.direction.y = 0
+                elif self.direction.y < 0:
+                    self.rect.top = collison_sprite.rect.bottom
+                    self.direction.y = 0
+            else:
+                self.direction.y += self.gravity
+                self.rect.y += self.direction.y
+                self.pos = self.rect.topleft
+                
+        # if not self.on_ladder:
+        #     self.direction.y += self.gravity
+        #     self.rect.y += self.direction.y
+        #     self.pos = self.rect.topleft
+    
+    def die(self):
+        self.collision_sprites = []
+        self.direction.y = -12
+        self.current_health = 0
+        
     def step(self):
         if self.movement_lockout.active:
             return False

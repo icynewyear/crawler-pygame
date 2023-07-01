@@ -67,13 +67,16 @@ class Level:
         self.enemies_layout = import_csv_layout(self.level_data['enemies'])
         self.enemies = self.create_tile_group(self.enemies_layout, 'enemies')
         
-        #constraints
+        #enemy constraints
         self.constraint_layout = import_csv_layout(self.level_data['constraints'])
         self.constraints = self.create_tile_group(self.constraint_layout, 'constraints')
         
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites() + self.bridge_tiles.sprites()
         self.player.collision_sprites = self.collision_sprites
+        
+    def add_to_enemy_sprites(self, sprite):
+        self.enemies.add(sprite)        
         
     def player_setup(self, layout):
         for row_index, row in enumerate(layout):
@@ -123,7 +126,7 @@ class Level:
                             tile = Waterfall((x,y), TILE_SIZE, 'water', True)
                      
                     if tile_type == 'enemies':
-                        tile = Enemy((x,y), self.check_enemy_constraints, col)  
+                        tile = Enemy((x,y), self.check_enemy_constraints, self.add_to_enemy_sprites, col)  
                     
                     if tile_type == 'doors':
                         if col == '2': state = 'open' 
@@ -202,6 +205,8 @@ class Level:
     def ladder_collision(self):
         player = self.player     
         waterfall_check = self.waterfall_tiles.sprites()
+        #contains tiles that are not of type 'water'
+        waterfall_ladder_check = [tile for tile in waterfall_check if tile.type != 'water']
         orb = player.check_item_in_inventory('orb')
         
         for sprite in self.ladder_tiles.sprites():
@@ -214,6 +219,7 @@ class Level:
             for sprite in waterfall_check:
                 if sprite.rect.colliderect(player.rect):
                     sprite.freeze()
+                    
                     player.on_ladder = True
                     return True
                 else:
@@ -253,9 +259,11 @@ class Level:
         player = self.player
         for sprite in self.spike_tiles:
             if sprite.rect.colliderect(player.rect):
-                player.current_health = 0
-                sprite.bleed()
-                self.gameover = True
+                if not self.gameover:
+                    player.die()
+                    self.collision_sprites = []
+                    sprite.bleed()
+                    self.gameover = True
                 
     def check_water_collisons(self):
         player = self.player
@@ -264,9 +272,11 @@ class Level:
             for sprite in self.waterfall_tiles:
                 if sprite.type == 'water' or sprite.type == 'bottom':
                     if sprite.rect.colliderect(player.rect):
-                        player.current_health = 0
-                        sprite.bleed()
-                        self.gameover = True
+                        if not self.gameover:
+                            player.die()
+                            self.collision_sprites = []
+                            sprite.bleed()
+                            self.gameover = True
                 
     def check_enemey_collsion(self):
         player = self.player
@@ -284,10 +294,13 @@ class Level:
                     player.current_health -= 1
     
                 if player.current_health <= 0:
-                    sprite.bleed = True
+                    sprite.bleed()
+                    player.die()
+                    
                     self.collision_sprites = []
                     self.gameover = True 
-         
+
+
     def run(self, dt):
         self.screen.fill(BG_COLOR)
         
