@@ -150,14 +150,11 @@ class Player(pygame.sprite.Sprite):
     def do_gravity(self):
         new_rect = self.rect.copy()
         new_rect.y += self.gravity
-        collison_sprite = None
-        
         collison_sprite = self.check_collisions(new_rect)
         if self.is_dead:
             self.on_ladder = False
         if not self.on_ladder:
-            
-            if collison_sprite != False:
+            if collison_sprite != False and not self.is_dead:
                 if self.direction.y > 0:
                     self.rect.bottom = collison_sprite.rect.top
                     self.on_ground = True
@@ -176,14 +173,13 @@ class Player(pygame.sprite.Sprite):
         #     self.pos = self.rect.topleft
     
     def die(self):
+        self.is_dead = True
         self.collision_sprites = []
         self.direction.y = -12
         self.current_health = 0
         
     def step(self):
-        if self.is_dead:
-            return False
-        if self.movement_lockout.active:
+        if self.movement_lockout.active or self.is_dead:
             return False
         return self.get_input()
                 

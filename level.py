@@ -219,9 +219,6 @@ class Level:
         #contains tiles that are not of type 'water'
         waterfall_ladder_check = [tile for tile in waterfall_check if tile.type != 'water']
         orb = player.check_item_in_inventory('orb')
-        if player.is_dead: 
-            player.on_ladder = False
-            return False
         for sprite in self.ladder_tiles.sprites():
             if sprite.rect.colliderect(player.rect):
                 player.on_ladder = True
@@ -377,12 +374,12 @@ class Level:
         
     
         #collisions
-        
-        self.check_coin_collision()
-        self.check_item_collision()
-        self.check_spike_collison()
-        self.check_trap_colllison()
-        self.check_water_collisons()
+        if not self.player.is_dead:
+            self.check_coin_collision()
+            self.check_item_collision()
+            self.check_spike_collison()
+            self.check_trap_colllison()
+            self.check_water_collisons()
     
         #player movement check 
         if self.player.step() and not self.gameover:
