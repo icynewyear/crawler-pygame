@@ -21,7 +21,7 @@ class Enemy(pygame.sprite.Sprite):
         self.screen = pygame.display.get_surface()
         
         self.type = type
-        self.bleed = False
+        self.bleeding = False
         
         self.whips = pygame.sprite.Group()
         self.add_to_enemy_sprites = add_to_enemy_sprites
@@ -33,7 +33,7 @@ class Enemy(pygame.sprite.Sprite):
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
         frame = self.frames[int(self.frame_index)]
-        if self.bleed: frame = tint_icon(frame, RED)
+        if self.bleeding: frame = tint_icon(frame, RED)
         self.image = pygame.transform.scale(frame, (TILE_SIZE, TILE_SIZE))
         if self.facing == 'right':
             self.image = pygame.transform.flip(self.image, True, False)
@@ -74,12 +74,7 @@ class Enemy(pygame.sprite.Sprite):
                 top_rect = new_rect.copy()
                 top_rect.x -= 16
                 top_rect.y -= self.speed - 24
-                
-            
-            # top_rect = new_rect.copy()
-            # top_rect.y -= self.speed - 24
-            # top_rect.x -= 16
-            
+          
             whip = Whip(new_rect.topleft, self.facing)
             whip_top = Whip(top_rect.topleft, 'top', 'tip')
             
@@ -118,7 +113,7 @@ class Enemy(pygame.sprite.Sprite):
             self.whip_stage = 0
     
     def bleed(self):
-        self.bleed = True
+        self.bleeding = True
                     
     def step(self):
         self.move()

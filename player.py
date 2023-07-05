@@ -21,6 +21,7 @@ class Player(pygame.sprite.Sprite):
         #combat
         self.max_health = 3
         self.current_health = 3
+        self.is_dead = False
         
         #image and animation
         self.frames = import_folder('graphics/player/walk')
@@ -106,11 +107,11 @@ class Player(pygame.sprite.Sprite):
         if step: self.pos = self.rect.topleft
             
         #ladder  
-        if keys[pygame.K_UP] and self.on_ladder:
+        if keys[pygame.K_UP] and self.on_ladder and not self.is_dead:
             self.rect.y -= self.speed
             self.pos = self.rect.topleft
             step = True
-        elif keys[pygame.K_DOWN] and self.on_ladder:
+        elif keys[pygame.K_DOWN] and self.on_ladder and not self.is_dead:
             self.rect.y += self.speed
             self.pos = self.rect.topleft
             step = True
@@ -152,6 +153,8 @@ class Player(pygame.sprite.Sprite):
         collison_sprite = None
         
         collison_sprite = self.check_collisions(new_rect)
+        if self.is_dead:
+            self.on_ladder = False
         if not self.on_ladder:
             
             if collison_sprite != False:
@@ -178,6 +181,8 @@ class Player(pygame.sprite.Sprite):
         self.current_health = 0
         
     def step(self):
+        if self.is_dead:
+            return False
         if self.movement_lockout.active:
             return False
         return self.get_input()

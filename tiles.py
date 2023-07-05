@@ -103,7 +103,7 @@ class Chest(StaticTile):
             player.add_inventory(self.contents)
             self.state = 'open'
 
-class Spikke(StaticTile):
+class Spike(StaticTile):
     def __init__(self, pos, type):
         terrain_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
         self.image = pygame.transform.flip(terrain_list[type], False, True)
@@ -113,6 +113,47 @@ class Spikke(StaticTile):
     def bleed(self):
         self.image = tint_icon(self.image, RED)
         self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        
+class SpikeTrap(StaticTile):
+    def __init__(self, pos, pointing = 'down', extended = False):
+        self.type = 'trap'
+        self.pointing = pointing
+        self.extended = extended
+        self.prep_images()
+        
+        if extended:
+            self.image = self.extended_img
+            self.damaging =True
+        else:
+            self.image = self.retracted_img
+            self.damaging = False
+             
+        super().__init__(pos, TILE_SIZE, self.image)
+        
+    def prep_images(self):
+        retracted = pygame.image.load('graphics/traps/retracted.png').convert_alpha()
+        extended = pygame.image.load('graphics/traps/extended.png').convert_alpha()
+        
+        if self.pointing == 'down':
+            retracted = pygame.transform.flip(retracted, False, True)
+        elif self.pointing == 'up':
+            extended = pygame.transform.flip(extended, False, True)
+        
+        self.retracted_img = pygame.transform.scale(retracted, (TILE_SIZE, TILE_SIZE))
+        self.extended_img = pygame.transform.scale(extended, (TILE_SIZE, TILE_SIZE))
+        
+    def step(self):    
+        if self.extended:
+            self.image = self.retracted_img
+            self.extended = False
+            self.damaging = False
+        else:
+            self.image = self.extended_img
+            self.extended = True
+            self.damaging = True
+            
+    def bleed(self):
+        self.image = tint_icon(self.image, RED)
         
     
 class ItemIcon(StaticTile):
