@@ -1,2 +1,2 @@
-# fish-pygame
-Small fish game
+# crawler-pygame
+Small dungeon crawler game
