@@ -7,11 +7,10 @@ from gamedata import *
 from items import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, check_for_interaction):
+    def __init__(self, pos, check_for_interaction, grid, grid_pos):
         super().__init__()
         #pos and movement
         self.pos = pos
-        self.grid = pygame.math.Vector2(pos[0] // TILE_SIZE, pos[1] // TILE_SIZE)
         self.facing = 'right'
         self.direction = pygame.math.Vector2(0, 0)
         self.speed = 64
@@ -31,7 +30,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = self.pos)
         
 
-        #collisio
+        #collision and grid
+        self.grid = grid
+        self.grid_pos = grid_pos
         self.last_direction = None
         self.on_ladder = False
         self.collision_sprites = None
@@ -48,10 +49,11 @@ class Player(pygame.sprite.Sprite):
         self.coins = 0
         self.lives = 3
         self.inventory = []
-        #self.inventory_test()
+        self.test()
 
-    def inventory_test(self):
-        self.add_inventory(BOOTS)
+    def test(self):
+        print(self.check_grid('down', 'W'))
+        self.print_grid()
        
     def check_item_in_inventory(self, item):
         for i in self.inventory:
@@ -92,7 +94,6 @@ class Player(pygame.sprite.Sprite):
             new_rect = self.rect.copy()
             new_rect.x -= self.speed
             if not self.check_collisions(new_rect):
-                self.grid -= (-1, 0)
                 self.rect.x -= self.speed
                 self.facing = 'left'
                 step = True
@@ -100,7 +101,6 @@ class Player(pygame.sprite.Sprite):
             new_rect = self.rect.copy()
             new_rect.x += self.speed
             if not self.check_collisions(new_rect):
-                self.grid += (1, 0)
                 self.rect.x += self.speed
                 self.facing = 'right'
                 step = True
@@ -124,6 +124,34 @@ class Player(pygame.sprite.Sprite):
             self.movement_lockout.start()
         return step
     
+    def check_grid(self, direction, check):
+        #returns true if the grid contains the check in the direction
+
+        if direction == 'up':
+            check_x = self.grid_pos[0]
+            check_y = self.grid_pos[1] - 1
+        elif direction == 'down':
+            check_x = self.grid_pos[0] 
+            check_y = self.grid_pos[1] + 1
+        elif direction == 'left':
+            check_x = self.grid_pos[0] - 1
+            check_y = self.grid_pos[1]
+        elif direction == 'right':
+            check_x = self.grid_pos[0] + 1
+            check_y = self.grid_pos[1]  
+        print(self.grid[check_y][check_x])
+        if check in self.grid[check_y][check_x]:
+            return True
+        else:
+            return False
+        
+    def print_grid(self):
+        #prints the rows and cols of the grid to the console in a formatted way
+        #for debugging
+        print(len(self.grid))
+        for x in self.grid:
+            print(x)
+            
     def check_collisions(self, rect, return_sprite = False):
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(rect):
@@ -146,7 +174,15 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         self.direction.y = -12
         self.on_ground = False
+    
+    def gravity_grid_test(self):
+        test = self.check_grid('down', 'W')
+        if not test:
+            self.direction.y += self.gravity
+            self.rect.y += self.direction.y
+            self.pos = self.rect.topleft
             
+           
     def do_gravity(self):
         new_rect = self.rect.copy()
         new_rect.y += self.gravity
@@ -185,6 +221,7 @@ class Player(pygame.sprite.Sprite):
                 
     def update(self):
         self.movement_lockout.update()
-        self.do_gravity()
+        #self.do_gravity()
+        self.gravity_grid_test()
         self.animate()
         if DEBUG: self.show_hitboxes()

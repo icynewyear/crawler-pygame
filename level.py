@@ -15,14 +15,8 @@ class Level:
         self.screen = screen
         self.gameover = False
         
-        
-        #player
-        self.player = pygame.sprite.GroupSingle()
-        self.player_layout = import_csv_layout(levels[0]['player'])
-        self.player_setup(self.player_layout)
-        
-        #ui
-        self.ui = UI(self.player.sprite)
+        #grid
+        self.grid = [[[] for col in range(TILE_WIDTH)] for row in range(TILE_HEIGHT)]
         
         #levels
         self.current_level = 0
@@ -76,9 +70,20 @@ class Level:
         self.trap_layout = import_csv_layout(self.level_data['traps'])
         self.traps = self.create_tile_group(self.trap_layout, 'traps')
         
+        #player
+        self.player = pygame.sprite.GroupSingle()
+        self.player_layout = import_csv_layout(levels[0]['player'])
+        self.player_setup(self.player_layout)
+        
+        #ui
+        self.ui = UI(self.player.sprite)
+        
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites() + self.bridge_tiles.sprites()
         self.player.sprite.collision_sprites = self.collision_sprites
+    
+       # print(self.grid)
+        
         
     def add_to_enemy_sprites(self, sprite):
         self.enemies.add(sprite)
@@ -89,8 +94,10 @@ class Level:
                 x = col_index * TILE_SIZE
                 y = row_index * TILE_SIZE
                 if col == '0':
-                    sprite = Player((x,y), self.check_for_interaction)
-                    self.player.add(sprite)
+                    self.grid[row_index][col_index].append('P')
+                    sprite = Player((x,y), self.check_for_interaction, self.grid, (col_index, row_index))
+                    self.player.add(sprite)    
+
     
     def create_tile_group(self, layout, tile_type):
         group = pygame.sprite.Group()
@@ -100,13 +107,27 @@ class Level:
                     x = col_index * TILE_SIZE
                     y = row_index * TILE_SIZE
                     
-                    if tile_type in ['terrain', 'ladders', 'bridges']:
+                    if tile_type == 'terrain':
                         terrain_tile_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
                         tile_surface = terrain_tile_list[int(col)]
                         tile = StaticTile((x,y), TILE_SIZE, pygame.transform.scale(tile_surface, (TILE_SIZE, TILE_SIZE)))
-                    
+                        self.grid[row_index][col_index].append('W')
+                        
+                    if tile_type == 'ladders':
+                        terrain_tile_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
+                        tile_surface = terrain_tile_list[int(col)]
+                        tile = StaticTile((x,y), TILE_SIZE, pygame.transform.scale(tile_surface, (TILE_SIZE, TILE_SIZE)))
+                        self.grid[row_index][col_index].append('L')
+                        
+                    if tile_type == 'bridges':
+                        terrain_tile_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
+                        tile_surface = terrain_tile_list[int(col)]
+                        tile = StaticTile((x,y), TILE_SIZE, pygame.transform.scale(tile_surface, (TILE_SIZE, TILE_SIZE)))
+                        self.grid[row_index][col_index].append('B')
+                        
                     if tile_type == 'spikes':
                         tile = Spike((x,y), int(col))
+                        self.grid[row_index][col_index].append('S')
                           
                     if tile_type == 'waterfalls':
                         if col == '4':
@@ -125,6 +146,8 @@ class Level:
                             tile = Waterfall((x,y), TILE_SIZE, 'water')
                         elif col == '22':
                             tile = Waterfall((x,y), TILE_SIZE, 'water', True)
+                        if col != '0':
+                            self.grid[row_index][col_index].append('W')
                      
                     if tile_type == 'enemies':
                         tile = Enemy((x,y), self.check_enemy_constraints, self.add_to_enemy_sprites, col)  
