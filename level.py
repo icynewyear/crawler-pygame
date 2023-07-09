@@ -17,10 +17,12 @@ class Level:
         
         
         #player
+        self.player = pygame.sprite.GroupSingle()
         self.player_layout = import_csv_layout(levels[0]['player'])
-        self.player_sprites = self.create_tile_group(self.player_layout, 'player')
+        self.player_setup(self.player_layout)
+        
         #ui
-        self.ui = UI(self.player_sprites.sprites()[0])
+        self.ui = UI(self.player.sprite)
         
         #levels
         self.current_level = 0
@@ -31,7 +33,6 @@ class Level:
         self.terrain_tiles = self.create_tile_group(self.terrain_layout, 'terrain')
         
         #ladders
-        
         self.ladder_layout = import_csv_layout(self.level_data['ladders'])
         self.ladder_tiles = self.create_tile_group(self.ladder_layout, 'ladders')
         
@@ -77,7 +78,7 @@ class Level:
         
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites() + self.bridge_tiles.sprites()
-        self.player.collision_sprites = self.collision_sprites
+        self.player.sprite.collision_sprites = self.collision_sprites
         
     def add_to_enemy_sprites(self, sprite):
         self.enemies.add(sprite)
@@ -88,7 +89,7 @@ class Level:
                 x = col_index * TILE_SIZE
                 y = row_index * TILE_SIZE
                 if col == '0':
-                    sprite = Player((x,y))
+                    sprite = Player((x,y), self.check_for_interaction)
                     self.player.add(sprite)
     
     def create_tile_group(self, layout, tile_type):
@@ -106,10 +107,6 @@ class Level:
                     
                     if tile_type == 'spikes':
                         tile = Spike((x,y), int(col))
-                        
-                    if tile_type == 'player':
-                        tile = Player((x,y),self.check_for_interaction)
-                        self.player = tile
                           
                     if tile_type == 'waterfalls':
                         if col == '4':
@@ -180,7 +177,7 @@ class Level:
         return group
     
     def horizontal_movement_collision(self):
-        player = self.player
+        player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         
         for sprite in self.collision_sprites:
@@ -194,7 +191,7 @@ class Level:
                 player.direction.x = 0
     
     def vertical_movement_collision(self):
-        player = self.player
+        player = self.player.sprite
         boots = player.check_item_in_inventory('boots')
         
         if boots: self.collision_sprites += self.spike_tiles.sprites()
@@ -214,7 +211,7 @@ class Level:
             player.on_ground = False
 
     def ladder_collision(self):
-        player = self.player     
+        player = self.player.sprite     
         waterfall_check = self.waterfall_tiles.sprites()
         #contains tiles that are not of type 'water'
         waterfall_ladder_check = [tile for tile in waterfall_check if tile.type != 'water']
@@ -236,7 +233,7 @@ class Level:
                     player.on_ladder = False    
     
     def check_for_interaction(self):
-        player = self.player
+        player = self.player.sprite
         interactables = self.door_tiles.sprites() + self.chest_tiles.sprites()
         for sprite in self.door_tiles:
             if sprite.rect.colliderect(player.rect):
@@ -252,21 +249,21 @@ class Level:
         return False
      
     def check_coin_collision(self):
-        player = self.player
+        player = self.player.sprite
         for sprite in self.coin_tiles:
             if sprite.rect.colliderect(player.rect):
                 sprite.kill()
                 player.coins += 1
     
     def check_item_collision(self):
-        player = self.player
+        player = self.player.sprite
         for sprite in self.item_tiles:
             if sprite.rect.colliderect(player.rect):
                 sprite.kill()
                 player.add_inventory(sprite.item)   
     
     def check_spike_collison(self):
-        player = self.player
+        player = self.player.sprite
         for sprite in self.spike_tiles:
             if sprite.rect.colliderect(player.rect):
                 if not self.gameover:
@@ -276,7 +273,7 @@ class Level:
                     self.gameover = True
     
     def check_trap_colllison(self):
-        player = self.player
+        player = self.player.sprite
         damaging_traps = [trap for trap in self.traps if trap.damaging]
         for sprite in damaging_traps:
             if sprite.rect.colliderect(player.rect):
@@ -287,7 +284,7 @@ class Level:
                     self.gameover = True
                 
     def check_water_collisons(self):
-        player = self.player
+        player = self.player.sprite
         orb = player.check_item_in_inventory('orb')
         if not orb:
             for sprite in self.waterfall_tiles:
@@ -300,7 +297,7 @@ class Level:
                             self.gameover = True
                 
     def check_enemey_collsion(self):
-        player = self.player
+        player = self.player.sprite
         sword = player.check_item_in_inventory('sword')
         shield = player.check_item_in_inventory('shield')
         for sprite in self.enemies:
@@ -323,7 +320,6 @@ class Level:
 
     def run(self, dt):
         self.screen.fill(BG_COLOR)
-        
         
         #terrain
         self.terrain_tiles.update()
@@ -374,7 +370,7 @@ class Level:
         
     
         #collisions
-        if not self.player.is_dead:
+        if not self.player.sprite.is_dead:
             self.check_coin_collision()
             self.check_item_collision()
             self.check_spike_collison()
@@ -382,7 +378,7 @@ class Level:
             self.check_water_collisons()
     
         #player movement check 
-        if self.player.step() and not self.gameover:
+        if self.player.sprite.step() and not self.gameover:
             #anything that is turn based goes here
             for enemy in self.enemies:
                 enemy.step()
@@ -390,15 +386,15 @@ class Level:
             for trap in self.traps:
                 trap.step()
                 
-        
         #enemies animation and draw
         self.enemies.update()
         self.enemies.draw(self.screen)
         
-        #player animation and draw       
-        self.player_sprites.update() 
-        self.player_sprites.draw(self.screen)
+        #player animation and draw  
+        self.player.update()
+        self.player.draw(self.screen)
         
+        #ui
         self.ui.run()
         if self.gameover:
             self.ui.display_game_over()

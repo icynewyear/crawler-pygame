@@ -108,7 +108,7 @@ class Player(pygame.sprite.Sprite):
             
         #ladder  
         if keys[pygame.K_UP] and self.on_ladder and not self.is_dead:
-            self.rect.y -= self.speed
+            self.rect.y -= self.speed 
             self.pos = self.rect.topleft
             step = True
         elif keys[pygame.K_DOWN] and self.on_ladder and not self.is_dead:
