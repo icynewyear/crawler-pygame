@@ -13,13 +13,13 @@ class Player(pygame.sprite.Sprite):
         self.pos = pos
         self.facing = 'right'
         self.direction = pygame.math.Vector2(0, 0)
-        self.speed = 64
+        self.speed = TILE_SIZE
         self.gravity = .6
         self.movement_lockout = Timer(250)
         
         #combat
         self.max_health = 3
-        self.current_health = 3
+        self.current_health = self.max_health
         self.is_dead = False
         
         #image and animation
@@ -124,9 +124,47 @@ class Player(pygame.sprite.Sprite):
             self.movement_lockout.start()
         return step
     
+    def get_input_grid_test(self):
+        keys = pygame.key.get_pressed()
+        step = False
+        
+        #left and right
+        if keys[pygame.K_LEFT]:
+            if not self.check_grid('left', 'W'):
+                self.update_grid_pos('left')
+                self.rect.x -= self.speed
+                self.facing = 'left'
+                step = True
+        elif keys[pygame.K_RIGHT]:
+            if not self.check_grid('right', 'W'):
+                self.update_grid_pos('right')
+                self.rect.x += self.speed
+                self.facing = 'right'
+                step = True
+        if step: self.pos = self.rect.topleft
+            
+        #ladder  
+        if keys[pygame.K_UP] and self.check_grid('up', 'L'):
+            self.rect.y -= self.speed 
+            self.pos = self.rect.topleft
+            step = True
+        elif keys[pygame.K_DOWN] and (self.check_grid('down', 'L') or self.check_grid('self', 'L')):
+            self.rect.y += self.speed
+            self.pos = self.rect.topleft
+            step = True
+        #interactables
+        if keys[pygame.K_e]:
+            self.check_for_interaction()
+            step = False
+        
+        if step: 
+            self.movement_lockout.start()
+        return step
+    
     def check_grid(self, direction, check):
         #returns true if the grid contains the check in the direction
-
+        #if check = HC checks for all horizontal collidables dont know if needed
+        #if check = VC checks for all vertical collidables
         if direction == 'up':
             check_x = self.grid_pos[0]
             check_y = self.grid_pos[1] - 1
@@ -139,12 +177,42 @@ class Player(pygame.sprite.Sprite):
         elif direction == 'right':
             check_x = self.grid_pos[0] + 1
             check_y = self.grid_pos[1]  
-        print(self.grid[check_y][check_x])
+        elif direction == 'self':   
+            check_x = self.grid_pos[0]
+            check_y = self.grid_pos[1]
+       # print(self.grid[check_y][check_x])
+        if check == 'VC':
+            orb = self.check_item_in_inventory('orb')
+            if orb:
+                if 'w' in self.grid[check_y][check_x]:
+                    return True
+            if any('W', 'L', 'S', 'B') in self.grid[check_y][check_x]:
+                return True
+            else:
+                return False
         if check in self.grid[check_y][check_x]:
             return True
         else:
             return False
-        
+    
+    def update_grid_pos(self, direction, amount_of_tiles = 1):
+       #updates the grid position of the player based on the direction and amount of tiles
+        if direction == 'up':
+            dest_x = self.grid_pos[0]
+            dest_y = self.grid_pos[1] - amount_of_tiles
+        elif direction == 'down':
+            dest_x = self.grid_pos[0] 
+            dest_y = self.grid_pos[1] + amount_of_tiles
+        elif direction == 'left':
+            dest_x = self.grid_pos[0] - amount_of_tiles
+            dest_y = self.grid_pos[1]
+        elif direction == 'right':
+            dest_x = self.grid_pos[0] + amount_of_tiles
+            dest_y = self.grid_pos[1]  
+        self.grid[self.grid_pos[1]][self.grid_pos[0]].remove('P')
+        self.grid[dest_y][dest_x].append('P')
+        self.grid_pos = (dest_x, dest_y)
+              
     def print_grid(self):
         #prints the rows and cols of the grid to the console in a formatted way
         #for debugging
@@ -178,9 +246,12 @@ class Player(pygame.sprite.Sprite):
     def gravity_grid_test(self):
         test = self.check_grid('down', 'W')
         if not test:
-            self.direction.y += self.gravity
-            self.rect.y += self.direction.y
-            self.pos = self.rect.topleft
+           # self.direction.y += self.speed
+            #self.rect.y += self.direction.y
+            self.update_grid_pos('down')
+            self.rect.y = self.grid_pos[1] * TILE_SIZE
+            self.pos = self.grid_pos[0] * TILE_SIZE, self.grid_pos[1] * TILE_SIZE
+           # self.pos = self.rect.topleft
             
            
     def do_gravity(self):
@@ -217,7 +288,7 @@ class Player(pygame.sprite.Sprite):
     def step(self):
         if self.movement_lockout.active or self.is_dead:
             return False
-        return self.get_input()
+        return self.get_input_grid_test()
                 
     def update(self):
         self.movement_lockout.update()

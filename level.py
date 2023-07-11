@@ -81,9 +81,6 @@ class Level:
         #collisons
         self.collision_sprites = self.terrain_tiles.sprites() + self.bridge_tiles.sprites()
         self.player.sprite.collision_sprites = self.collision_sprites
-    
-       # print(self.grid)
-        
         
     def add_to_enemy_sprites(self, sprite):
         self.enemies.add(sprite)
@@ -98,7 +95,6 @@ class Level:
                     sprite = Player((x,y), self.check_for_interaction, self.grid, (col_index, row_index))
                     self.player.add(sprite)    
 
-    
     def create_tile_group(self, layout, tile_type):
         group = pygame.sprite.Group()
         for row_index, row in enumerate(layout):
@@ -146,8 +142,12 @@ class Level:
                             tile = Waterfall((x,y), TILE_SIZE, 'water')
                         elif col == '22':
                             tile = Waterfall((x,y), TILE_SIZE, 'water', True)
-                        if col != '0':
-                            self.grid[row_index][col_index].append('W')
+                        water = {'21','22'}
+                        if col in water:
+                            self.grid[row_index][col_index].append('w')
+                        waterfall = {'4','5','9','10','15','16'}
+                        if col in waterfall:
+                            self.grid[row_index][col_index].append('F')
                      
                     if tile_type == 'enemies':
                         tile = Enemy((x,y), self.check_enemy_constraints, self.add_to_enemy_sprites, col)  
