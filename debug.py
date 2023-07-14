@@ -5,7 +5,7 @@ from settings import DEBUG
 pygame.init()
 
 #display given string on screen
-def debug(output, pos=(0,0)):
+def debug(output, pos=(80,80)):
     screen = pygame.display.get_surface()
     #set up font
     font = pygame.font.SysFont('Arial', 20)

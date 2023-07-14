@@ -142,7 +142,7 @@ class Level:
                             tile = Waterfall((x,y), TILE_SIZE, 'water')
                         elif col == '22':
                             tile = Waterfall((x,y), TILE_SIZE, 'water', True)
-                        water = {'21','22'}
+                        water = {'21','22', '15'}
                         if col in water:
                             self.grid[row_index][col_index].append('w')
                         waterfall = {'4','5','9','10','15','16'}
@@ -247,13 +247,22 @@ class Level:
                 player.on_ladder = False
         if orb:
             for sprite in waterfall_check:
+                test_rect = player.rect.copy()
+                test_rect.y += 64
+                collision = False
+                
+                if sprite.rect.colliderect(test_rect):
+                    sprite.freeze()
+                    collision = True
                 if sprite.rect.colliderect(player.rect):
                     sprite.freeze()
-                    
                     player.on_ladder = True
                     return True
+                if collision:
+                    return True
                 else:
-                    player.on_ladder = False    
+                    player.on_ladder = False  
+                  
     
     def check_for_interaction(self):
         player = self.player.sprite
@@ -393,7 +402,7 @@ class Level:
         
     
         #collisions
-        if not self.player.sprite.is_dead:
+        if not self.gameover:
             self.check_coin_collision()
             self.check_item_collision()
             self.check_spike_collison()

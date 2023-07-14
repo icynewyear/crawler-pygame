@@ -1,4 +1,4 @@
-DEBUG = True
+DEBUG = False
 COLOR = True
 
 # screen

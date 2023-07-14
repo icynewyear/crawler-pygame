@@ -29,13 +29,14 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft = self.pos)
         
-
         #collision and grid
         self.grid = grid
         self.grid_pos = grid_pos
         self.last_direction = None
         self.on_ladder = False
         self.collision_sprites = None
+        self.walkable_tiles = {'W', 'L', 'B'}
+        self.vertical_collidable_tiles = {'W', 'B'}
         
         # player status
         self.facing_right = True
@@ -49,7 +50,12 @@ class Player(pygame.sprite.Sprite):
         self.coins = 0
         self.lives = 3
         self.inventory = []
-        self.test()
+        
+        #death animaion
+        self.angle = 0
+        self.dy = -15
+        self.death_animation_over = False
+        
 
     def test(self):
         print(self.check_grid('down', 'W'))
@@ -84,47 +90,8 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
         else:
             self.image = pygame.transform.flip(pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE)), True, False)
-   
-    def get_input(self):
-        keys = pygame.key.get_pressed()
-        step = False
-        
-        #left and right
-        if keys[pygame.K_LEFT]:
-            new_rect = self.rect.copy()
-            new_rect.x -= self.speed
-            if not self.check_collisions(new_rect):
-                self.rect.x -= self.speed
-                self.facing = 'left'
-                step = True
-        elif keys[pygame.K_RIGHT]:
-            new_rect = self.rect.copy()
-            new_rect.x += self.speed
-            if not self.check_collisions(new_rect):
-                self.rect.x += self.speed
-                self.facing = 'right'
-                step = True
-        if step: self.pos = self.rect.topleft
-            
-        #ladder  
-        if keys[pygame.K_UP] and self.on_ladder and not self.is_dead:
-            self.rect.y -= self.speed 
-            self.pos = self.rect.topleft
-            step = True
-        elif keys[pygame.K_DOWN] and self.on_ladder and not self.is_dead:
-            self.rect.y += self.speed
-            self.pos = self.rect.topleft
-            step = True
-        #interactables
-        if keys[pygame.K_e]:
-            self.check_for_interaction()
-            step = False
-        
-        if step: 
-            self.movement_lockout.start()
-        return step
     
-    def get_input_grid_test(self):
+    def get_input(self):
         keys = pygame.key.get_pressed()
         step = False
         
@@ -141,30 +108,37 @@ class Player(pygame.sprite.Sprite):
                 self.rect.x += self.speed
                 self.facing = 'right'
                 step = True
-        if step: self.pos = self.rect.topleft
             
-        #ladder  
-        if keys[pygame.K_UP] and self.check_grid('up', 'L'):
+        #ladder          
+        if keys[pygame.K_UP] and self.check_grid('self', 'L'):
+            self.update_grid_pos('up')
             self.rect.y -= self.speed 
-            self.pos = self.rect.topleft
             step = True
-        elif keys[pygame.K_DOWN] and (self.check_grid('down', 'L') or self.check_grid('self', 'L')):
+        elif keys[pygame.K_DOWN] and (self.check_grid('down', 'L') or (self.check_grid('self', 'L') and not self.check_grid('down', 'VC'))):
+            self.update_grid_pos('down')
             self.rect.y += self.speed
-            self.pos = self.rect.topleft
             step = True
+            
         #interactables
         if keys[pygame.K_e]:
             self.check_for_interaction()
             step = False
         
         if step: 
+            self.pos = self.rect.topleft
             self.movement_lockout.start()
         return step
     
     def check_grid(self, direction, check):
         #returns true if the grid contains the check in the direction
         #if check = HC checks for all horizontal collidables dont know if needed
+        #if check = LC checks for all non ladder vertical collidables
         #if check = VC checks for all vertical collidables
+        
+        #sets check_x and check_y based on direction
+        orb = self.check_item_in_inventory('orb')
+        boots = self.check_item_in_inventory('boots')
+        
         if direction == 'up':
             check_x = self.grid_pos[0]
             check_y = self.grid_pos[1] - 1
@@ -180,17 +154,37 @@ class Player(pygame.sprite.Sprite):
         elif direction == 'self':   
             check_x = self.grid_pos[0]
             check_y = self.grid_pos[1]
-       # print(self.grid[check_y][check_x])
-        if check == 'VC':
-            orb = self.check_item_in_inventory('orb')
+        
+        #checks if the check is out of bounds
+        if check_y < 0 or check_y > TILE_HEIGHT - 1 or check_x < 0 or check_x > TILE_WIDTH - 1:
+           return False
+       
+        gridcheck = self.grid[check_y][check_x]
+        
+        #checks Vertical Collidables
+        if check == 'VC' or check == 'LC':
+            if check == 'VC':
+                walkable = self.walkable_tiles
+            if check == 'LC':
+                walkable = self.vertical_collidable_tiles
+            
             if orb:
-                if 'w' in self.grid[check_y][check_x]:
+                walkable.add('w')
+                walkable.add('F')
+            if boots:
+                walkable.add('S')
+                  
+            for i in walkable:
+                if i in gridcheck:
                     return True
-            if any('W', 'L', 'S', 'B') in self.grid[check_y][check_x]:
+            return False
+        
+        #orb/ladder checks
+        if orb and check == 'L':
+            if 'F' in gridcheck:
                 return True
-            else:
-                return False
-        if check in self.grid[check_y][check_x]:
+            
+        if check in gridcheck:
             return True
         else:
             return False
@@ -219,7 +213,7 @@ class Player(pygame.sprite.Sprite):
         print(len(self.grid))
         for x in self.grid:
             print(x)
-            
+             
     def check_collisions(self, rect, return_sprite = False):
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(rect):
@@ -239,60 +233,50 @@ class Player(pygame.sprite.Sprite):
             pygame.draw.circle(screen, LIGHT_BLUE, self.pos, 5)  
             pygame.draw.circle(screen, ORANGE, (self.rect.right, self.rect.centery), 5)
         
-    def jump(self):
-        self.direction.y = -12
-        self.on_ground = False
+    def check_spike_collion(self):
+        if self.check_grid('self', 'S'):
+            self.die()
     
-    def gravity_grid_test(self):
-        test = self.check_grid('down', 'W')
+    def do_gravity(self):
+        test = self.check_grid('down', 'VC')
         if not test:
-           # self.direction.y += self.speed
-            #self.rect.y += self.direction.y
             self.update_grid_pos('down')
             self.rect.y = self.grid_pos[1] * TILE_SIZE
             self.pos = self.grid_pos[0] * TILE_SIZE, self.grid_pos[1] * TILE_SIZE
-           # self.pos = self.rect.topleft
-            
-           
-    def do_gravity(self):
-        new_rect = self.rect.copy()
-        new_rect.y += self.gravity
-        collison_sprite = self.check_collisions(new_rect)
-        if self.is_dead:
-            self.on_ladder = False
-        if not self.on_ladder:
-            if collison_sprite != False and not self.is_dead:
-                if self.direction.y > 0:
-                    self.rect.bottom = collison_sprite.rect.top
-                    self.on_ground = True
-                    self.direction.y = 0
-                elif self.direction.y < 0:
-                    self.rect.top = collison_sprite.rect.bottom
-                    self.direction.y = 0
-            else:
-                self.direction.y += self.gravity
-                self.rect.y += self.direction.y
-                self.pos = self.rect.topleft
-                
-        # if not self.on_ladder:
-        #     self.direction.y += self.gravity
-        #     self.rect.y += self.direction.y
-        #     self.pos = self.rect.topleft
-    
+                 
     def die(self):
         self.is_dead = True
         self.collision_sprites = []
-        self.direction.y = -12
-        self.current_health = 0
+        # check = self.death_animation()
+        # while not check:
+        #     check = self.death_animation()
+        # self.direction.y = -12
+        # self.current_health = 0
+    
+    def death_animation(self, start = True):
+        self.rect.y += self.dy
+        self.dy += 1
         
+        #roatate the player
+        self.angle += 10
+        self.image = pygame.transform.rotate(self.image, self.angle)
+        self.rect = self.image.get_rect(center = self.rect.center)
+        
+        #check if the player is off the screen
+        if self.rect.top > SCREEN_HEIGHT:
+            self.over = True
+           
     def step(self):
         if self.movement_lockout.active or self.is_dead:
             return False
-        return self.get_input_grid_test()
+        return self.get_input()
                 
     def update(self):
         self.movement_lockout.update()
-        #self.do_gravity()
-        self.gravity_grid_test()
+        if not self.is_dead:
+            self.do_gravity()
+            self.check_spike_collion()
+        if self.is_dead and not self.death_animation_over:
+            self.death_animation()
         self.animate()
         if DEBUG: self.show_hitboxes()
