@@ -87,9 +87,11 @@ class Level:
         self.player.sprite.collision_sprites = self.collision_sprites
         
     def add_to_enemy_sprites(self, sprite):
+        """add sprite to enemy group. passedd to enemies that have weapons"""
         self.enemies.add(sprite)
         
     def player_setup(self, layout):
+        """create player sprite and add to player group"""
         for row_index, row in enumerate(layout):
             for col_index, col in enumerate(row):
                 x = col_index * TILE_SIZE
@@ -100,6 +102,8 @@ class Level:
                     self.player.add(sprite)    
 
     def create_tile_group(self, layout, tile_type):
+        """create tile group from csv layout"""
+        #TODO switch to tmxdata
         group = pygame.sprite.Group()
         for row_index, row in enumerate(layout):
             for col_index, col in enumerate(row):
@@ -210,6 +214,7 @@ class Level:
         return group
     
     def horizontal_movement_collision(self):
+        """check for horizontal movement collisions. I believe no longer needed"""
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         
@@ -224,6 +229,7 @@ class Level:
                 player.direction.x = 0
     
     def vertical_movement_collision(self):
+        """check for vertical movement collisions. I believe no longer needed"""
         player = self.player.sprite
         boots = player.check_item_in_inventory('boots')
         
@@ -244,6 +250,7 @@ class Level:
             player.on_ground = False
 
     def ladder_collision(self):
+        """check for ladder collisions. sets player.on_ladder"""
         player = self.player.sprite     
         waterfall_check = self.waterfall_tiles.sprites()
         #contains tiles that are not of type 'water'
@@ -274,6 +281,7 @@ class Level:
                     player.on_ladder = False  
                   
     def check_for_interaction(self):
+        """check for player interaction with doors, chests, and pull chains, etc. Passed to player"""
         player = self.player.sprite
         interactables = self.door_tiles.sprites() + self.chest_tiles.sprites()
         for sprite in interactables:
@@ -286,12 +294,14 @@ class Level:
                 sprite.interact(player)
             
     def check_enemy_constraints(self, rect):
+        """check for enemy constraints. Passed to enemies"""
         for sprite in self.constraints:
             if sprite.rect.colliderect(rect):
                 return True
         return False
      
     def check_coin_collision(self):
+        """check for coin collisions. Adds 1 coin to player.coins"""
         player = self.player.sprite
         for sprite in self.coin_tiles:
             if sprite.rect.colliderect(player.rect):
@@ -299,6 +309,7 @@ class Level:
                 player.coins += 1
     
     def check_item_collision(self):
+        """check for item collisions. Adds item to player inventory"""
         player = self.player.sprite
         for sprite in self.item_tiles:
             if sprite.rect.colliderect(player.rect):
@@ -306,6 +317,7 @@ class Level:
                 player.add_inventory(sprite.item)   
     
     def check_spike_collison(self):
+        """check for spike collisions. Kills player and makes spike bleed"""
         player = self.player.sprite
         for sprite in self.spike_tiles:
             if sprite.rect.colliderect(player.rect):
@@ -316,6 +328,7 @@ class Level:
                     self.gameover = True
     
     def check_trap_colllison(self):
+        """check for trap collisions. Kills player and makes trap bleed"""
         player = self.player.sprite
         damaging_traps = [trap for trap in self.traps if trap.damaging]
         for sprite in damaging_traps:
@@ -327,6 +340,7 @@ class Level:
                     self.gameover = True
                 
     def check_water_collisons(self):
+        """check for water collisions if the player does not have an orb. Kills player and makes water bleed"""
         player = self.player.sprite
         orb = player.check_item_in_inventory('orb')
         if not orb:
@@ -340,6 +354,7 @@ class Level:
                             self.gameover = True
                 
     def check_enemey_collsion(self):
+        """check for enemy collisions. damages player."""
         player = self.player.sprite
         sword = player.check_item_in_inventory('sword')
         shield = player.check_item_in_inventory('shield')
@@ -361,7 +376,8 @@ class Level:
                     self.collision_sprites = []
                     self.gameover = True 
 
-    def run(self, dt):
+    def run(self):
+        """runs level. updates and draws all sprites. runs all level and player functions"""
         self.screen.fill(BG_COLOR)
         
         #terrain
@@ -412,8 +428,8 @@ class Level:
         #Player Collisions
     
         self.ladder_collision()
-        self.vertical_movement_collision()
-        self.horizontal_movement_collision()
+       # self.vertical_movement_collision()
+       # self.horizontal_movement_collision()
         
     
         #collisions
