@@ -23,12 +23,14 @@ class AnimatedTile(Tile):
         self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
     
     def animate(self):
+        """Animate the tile sprite"""
         self.frame_index += self.animation_speed
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
         self.image = pygame.transform.scale(self.frames[int(self.frame_index)], (TILE_SIZE, TILE_SIZE))
     
     def update(self):
+        """Update the tile sprite"""
         super().update()
         self.animate()
         
@@ -50,6 +52,7 @@ class Waterfall(AnimatedTile):
         super().__init__(pos, size, frames)
 
     def bleed(self):
+        """Tints the waterfall red"""
         new_surf_list = []
         for frame in self.frames:
             new_frame = tint_icon(frame, RED)
@@ -57,12 +60,14 @@ class Waterfall(AnimatedTile):
         self.frames = new_surf_list
     
     def freeze(self):
+        """Freezes the waterfall. Stops animation and tints the image"""
         self.frozen = True
         self.animation_speed = 0
         new_frame = tint_icon(self.frames[0], LIGHT_BLUE)
         self.image = pygame.transform.scale(new_frame, (TILE_SIZE, TILE_SIZE))
     
     def animate(self):
+        """Animate the tile sprite"""
         if not self.frozen:
             super().animate()
         
@@ -81,6 +86,7 @@ class Door(StaticTile):
         super().__init__(pos, TILE_SIZE, self.surface)
         
     def interact(self, player):
+        """Opens the door if the player has a key"""
         if player.check_item_in_inventory('key') and self.state == 'closed':
             self.image = pygame.image.load('graphics/door/open.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
@@ -97,6 +103,7 @@ class Chest(StaticTile):
         super().__init__(pos, TILE_SIZE, self.surface)
     
     def interact(self, player):
+        """Opens the chest and adds the contents to the player's inventory"""
         if self.state == 'closed':
             self.image = pygame.image.load('graphics/chest/open.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
@@ -111,6 +118,7 @@ class PullChain(StaticTile):
         super().__init__(pos, TILE_SIZE, self.image)
         
     def prep_images(self):
+        """loads and scales the images for the pull chain"""
         if self.state == 'down':
             #combies base and tip image
             #loads
@@ -132,9 +140,8 @@ class PullChain(StaticTile):
             self.image = tip
             
     def interact(self, player):
-        print('interacting')
+        """Pulls the chain up or down"""
         if self.state == 'down':
-            print('pulling chain')
             self.state = 'up'
             self.prep_images()
         else:
@@ -142,6 +149,7 @@ class PullChain(StaticTile):
             self.prep_images()
     
     def tint(self, color):
+        """Tints the chain"""
         self.image = tint_icon(self.image, color)
     
 class Button(StaticTile):
@@ -153,6 +161,7 @@ class Button(StaticTile):
         super().__init__(pos, TILE_SIZE, self.surface)
         
     def interact(self, player):
+        """Toggles the button state"""
         if self.state == 'off':
             self.state = 'on'
         else:
@@ -168,6 +177,7 @@ class Spike(StaticTile):
         super().__init__(pos, TILE_SIZE, self.surface)
     
     def bleed(self):
+        """Tints the spike red"""
         self.image = tint_icon(self.image, RED)
         self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
         
@@ -188,6 +198,7 @@ class SpikeTrap(StaticTile):
         super().__init__(pos, TILE_SIZE, self.image)
         
     def prep_images(self):
+        """loads and scales the images for the spike trap"""
         retracted = pygame.image.load('graphics/traps/retracted.png').convert_alpha()
         extended = pygame.image.load('graphics/traps/extended.png').convert_alpha()
         
@@ -199,7 +210,8 @@ class SpikeTrap(StaticTile):
         self.retracted_img = pygame.transform.scale(retracted, (TILE_SIZE, TILE_SIZE))
         self.extended_img = pygame.transform.scale(extended, (TILE_SIZE, TILE_SIZE))
         
-    def step(self):    
+    def step(self): 
+        """alternates between extended and retracted"""
         if self.extended:
             self.image = self.retracted_img
             self.extended = False
@@ -210,6 +222,7 @@ class SpikeTrap(StaticTile):
             self.damaging = True
             
     def bleed(self):
+        """Tints the spike trap red"""
         self.image = tint_icon(self.image, RED)
             
 class ItemIcon(StaticTile):

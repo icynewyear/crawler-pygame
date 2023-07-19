@@ -5,6 +5,7 @@ from settings import *
 
 
 def import_folder(path):
+    """imports a folder of images and returns a list of surfaces"""
     surface_list = []
     for _,__,files in walk(path):
         for image in files:
@@ -14,6 +15,7 @@ def import_folder(path):
     return surface_list
 
 def import_folder_dict(path):
+    """imports a folder of images and returns a dictionary of surfaces"""
     surface_dict = {}
     for _,__,files in walk(path):
         for image in files:
@@ -23,6 +25,7 @@ def import_folder_dict(path):
     return surface_dict
 
 def import_csv_layout(path):
+    """imports a csv file and returns a list of lists"""
     terrain_map = []
     with open(path) as csvfile:
         level = reader(csvfile, delimiter=',')
@@ -31,6 +34,7 @@ def import_csv_layout(path):
         return terrain_map
 
 def import_cut_graphics(path):
+    """imports a tileset and returns a list of surfaces"""
     surface = pygame.image.load(path).convert_alpha()
     tile_num_x = int(surface.get_size()[0] / TILESET_SIZE)
     tile_num_y = int(surface.get_size()[1] / TILESET_SIZE)
@@ -48,6 +52,7 @@ def import_cut_graphics(path):
     return tiles
 
 def tint_icon(icon, tint_color):
+    """tints an icon with a given color"""
     for x in range(icon.get_width()):
         for y in range(icon.get_height()):
             color = icon.get_at((x,y))

@@ -6,6 +6,7 @@ pygame.init()
 
 #display given string on screen
 def debug(output, pos=(80,80)):
+    """displays the given string on the screen at the given position"""
     screen = pygame.display.get_surface()
     #set up font
     font = pygame.font.SysFont('Arial', 20)

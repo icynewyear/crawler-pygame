@@ -12,11 +12,13 @@ class UI:
         self.gameover_font = pygame.font.Font('graphics/ARCADECLASSIC.ttf', 128)
         
     def display_inventory(self):
+        """displays the player's inventory"""
         for index, item in enumerate(self.player.inventory):
             display_item = pygame.transform.scale(item[1], (64, 64))
             self.screen.blit(display_item, (20 + index * 64, 640))
     
     def display_health(self):
+        """displays the player's health"""
         for index in range(self.player.max_health):
             heart = pygame.image.load('graphics/unsorted/heart_a.png').convert_alpha()
             #if COLOR:
@@ -29,6 +31,7 @@ class UI:
             self.screen.blit(heart, (748 + index * 64, 640))
     
     def display_lives(self):
+        """displays the player's lives count"""
         #icon
         player_icon = pygame.image.load('graphics/player/walk/00.png').convert_alpha()
         player_icon = pygame.transform.scale(player_icon, (TILE_SIZE, TILE_SIZE))
@@ -44,6 +47,7 @@ class UI:
         self.screen.blit(surf, (662,640))
     
     def display_coins(self):
+        """displays the player's coin count"""
         #icon
         coin_img = pygame.image.load('graphics/coin/00.png').convert_alpha()
         if COLOR:
@@ -59,6 +63,7 @@ class UI:
         self.screen.blit(surf, (515,640))
     
     def display_game_over(self):
+        """displays the game over screen"""
         for i in range(30):
             if i % 2 == 0:
                 color = BLACK
@@ -68,7 +73,8 @@ class UI:
             self.screen.blit(surf, ((SCREEN_WIDTH//2 - surf.get_width()//2) - i, (SCREEN_HEIGHT//2 - surf.get_height()//2) - i))
     
     def run(self):
+        """runs the ui"""
         self.display_inventory()
         self.display_coins()
-        #self.display_lives()
+        self.display_lives()
         self.display_health()

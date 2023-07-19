@@ -8,15 +8,18 @@ class Timer:
         self.active = False
 
     def start(self):
+        """starts the timer"""
         self.active = True
         self.start_time = pygame.time.get_ticks()
 
     def stop(self):
+        """stops the timer"""
         self.active = False
         if self.end_func:
             self.end_func()
 
     def update(self):
+        """updates the timer"""
         if self.active:
             now = pygame.time.get_ticks()
             if now - self.start_time >= self.duration:
