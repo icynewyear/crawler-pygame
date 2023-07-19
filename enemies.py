@@ -29,6 +29,7 @@ class Enemy(pygame.sprite.Sprite):
         self.whip_stage = 0
         
     def animate(self):
+        '''Animate the enemy sprite'''
         self.frame_index += self.animation_speed
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
@@ -39,6 +40,7 @@ class Enemy(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, True, False)
      
     def move(self):
+        '""Move the enemy sprite. moves direction of facing until it hits a constraint then turns around""'
         test_rect = self.rect.copy()
         if self.facing =='right':
             test_rect.x += self.speed
@@ -55,6 +57,8 @@ class Enemy(pygame.sprite.Sprite):
                 self.facing = 'right'
     
     def whip(self):
+        """creats a whip sprite and adds it to the whips group"""
+        
         if self.whip_stage == 0 or self.whip_stage == 2:
             for whip in self.whips:
                 whip.kill()
@@ -113,14 +117,17 @@ class Enemy(pygame.sprite.Sprite):
             self.whip_stage = 0
     
     def bleed(self):
+        """turns the enemy red"""
         self.bleeding = True
                     
     def step(self):
+        """runs the enemy's step. if type 2 it will also whip"""
         self.move()
         if self.type == '2':
             self.whip()
         
     def update(self):
+        """updates the enemy sprite animtion and draws the whips  """
         self.animate()
         self.whips.update()
         self.whips.draw(self.screen)
@@ -135,6 +142,7 @@ class Whip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = orgin_pos)
         
     def prep_images(self, type):
+        """loads and prepares whip images"""
         #load
         if type == 'base':
             base = pygame.image.load('graphics/chain/base.png').convert_alpha()
@@ -148,6 +156,7 @@ class Whip(pygame.sprite.Sprite):
             self.image = tip
 
     def set_image_facing(self):
+        """sets image orientation based on facing"""
         if self.facing == 'right':
             img = pygame.transform.rotate(self.image, 0)
         elif self.facing == 'left':
@@ -160,7 +169,9 @@ class Whip(pygame.sprite.Sprite):
         self.image = image
     
     def bleed(self):
+        """turns the whip red"""
         self.image = tint_icon(self.image, RED)
 
     def step(self):
+        """empty step function"""
         pass 
