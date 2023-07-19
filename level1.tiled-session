@@ -1,8 +1,17 @@
 {
-    "activeFile": "tiles/blackBG_tileset.tsx",
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "levels/level01.tmx",
     "expandedProjectPaths": [
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "levels/door_a.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 1
+        },
         "levels/level0.tmx": {
             "scale": 6.444166666666666,
             "selectedLayer": 3,
@@ -11,12 +20,20 @@
                 "y": 40.11379800853485
             }
         },
+        "levels/level01.tmx": {
+            "scale": 7.4575,
+            "selectedLayer": 7,
+            "viewCenter": {
+                "x": 36.13811599061348,
+                "y": 38.88702648340596
+            }
+        },
         "tiles/alphaBG_tileset.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 3,
             "scaleInEditor": 6.4856
         },
         "tiles/blackBG_tileset.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 3,
             "scaleInEditor": 5.9479
         },
         "tiles/caves.tsx": {
@@ -24,7 +41,15 @@
             "scaleInEditor": 1
         },
         "tiles/character_b.tsx": {
-            "scaleInDock": 4.4512,
+            "scaleInDock": 3,
+            "scaleInEditor": 1
+        },
+        "tiles/coin_a.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 1
+        },
+        "tiles/enemy1_a.tsx": {
+            "scaleInDock": 3,
             "scaleInEditor": 1
         },
         "tiles/props1.tsx": {
@@ -32,7 +57,7 @@
             "scaleInEditor": 1
         },
         "tiles/tileset.tsx": {
-            "scaleInDock": 4.6556,
+            "scaleInDock": 3,
             "scaleInEditor": 6.5106
         },
         "tiles/tileset_b.tsx": {
@@ -41,19 +66,32 @@
         }
     },
     "last.imagePath": "C:/Users/antho/Downloads/1bit doungeon platformer/1bit doungeon platformer",
+    "map.height": 10,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "map.width": 10,
     "openFiles": [
         "tiles/tileset.tsx",
-        "levels/level0.tmx",
         "tiles/character_b.tsx",
-        "tiles/blackBG_tileset.tsx"
+        "tiles/blackBG_tileset.tsx",
+        "levels/level01.tmx",
+        "tiles/enemy1_a.tsx",
+        "tiles/coin_a.tsx",
+        "levels/door_a.tsx",
+        "tiles/alphaBG_tileset.tsx"
     ],
     "project": "",
     "recentFiles": [
         "tiles/tileset.tsx",
-        "levels/level0.tmx",
         "tiles/character_b.tsx",
         "tiles/blackBG_tileset.tsx",
         "tiles/alphaBG_tileset.tsx",
+        "levels/door_a.tsx",
+        "tiles/coin_a.tsx",
+        "tiles/enemy1_a.tsx",
+        "levels/level01.tmx",
+        "levels/level0.tmx",
         "tiles/tileset_b.tsx",
         "tiles/caves.tsx",
         "tiles/props1.tsx"

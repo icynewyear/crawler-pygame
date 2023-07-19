@@ -70,6 +70,10 @@ class Level:
         self.trap_layout = import_csv_layout(self.level_data['traps'])
         self.traps = self.create_tile_group(self.trap_layout, 'traps')
         
+        #buttons
+        self.button_layout = import_csv_layout(self.level_data['pullchains'])
+        self.pull_chains = self.create_tile_group(self.button_layout, 'pullchains')
+        
         #player
         self.player = pygame.sprite.GroupSingle()
         self.player_layout = import_csv_layout(levels[0]['player'])
@@ -195,6 +199,12 @@ class Level:
                             tile = SpikeTrap((x,y)) 
                         if col == '2':
                             tile = SpikeTrap((x,y), 'up')
+                    
+                    if tile_type == 'pullchains':
+                        if col == '1':
+                            tile = PullChain((x,y))
+                        if col == '2':
+                            tile = PullChain((x,y), 'up')
                       
                     group.add(tile)
         return group
@@ -263,17 +273,18 @@ class Level:
                 else:
                     player.on_ladder = False  
                   
-    
     def check_for_interaction(self):
         player = self.player.sprite
         interactables = self.door_tiles.sprites() + self.chest_tiles.sprites()
-        for sprite in self.door_tiles:
+        for sprite in interactables:
             if sprite.rect.colliderect(player.rect):
                 sprite.interact(player)
-        for sprite in self.chest_tiles:
-            if sprite.rect.colliderect(player.rect):
+        for sprite in self.pull_chains.sprites():
+            test_rect = sprite.rect.copy()
+            test_rect.y += TILE_SIZE
+            if player.rect.colliderect(test_rect):
                 sprite.interact(player)
-    
+            
     def check_enemy_constraints(self, rect):
         for sprite in self.constraints:
             if sprite.rect.colliderect(rect):
@@ -393,6 +404,10 @@ class Level:
         #items
         self.item_tiles.update()
         self.item_tiles.draw(self.screen)
+        
+        #buttons
+        self.pull_chains.update()
+        self.pull_chains.draw(self.screen)
     
         #Player Collisions
     

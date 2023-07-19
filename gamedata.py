@@ -12,6 +12,7 @@ level_0 = {
     'items': 'data/level0/level0._items.csv',
     'spikes': 'data/level0/level0._spikes.csv',
     'traps': 'data/level0/level0._traps.csv',
+    'pullchains': 'data/level0/level0._pullchains.csv',
 }
 
 levels = {

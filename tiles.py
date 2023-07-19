@@ -102,7 +102,64 @@ class Chest(StaticTile):
             self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
             player.add_inventory(self.contents)
             self.state = 'open'
-
+            
+class PullChain(StaticTile):
+    def __init__(self, pos, state = 'down'):
+        self.state = state
+        self.prep_images()
+        
+        super().__init__(pos, TILE_SIZE, self.image)
+        
+    def prep_images(self):
+        if self.state == 'down':
+            #combies base and tip image
+            #loads
+            base = pygame.image.load('graphics/chain/base.png').convert_alpha()
+            tip = pygame.image.load('graphics/chain/tip.png').convert_alpha()
+            #resizes
+            base = pygame.transform.scale(base, (TILE_SIZE, TILE_SIZE))
+            tip = pygame.transform.scale(tip, (TILE_SIZE, TILE_SIZE))
+            #combines
+            image = pygame.Surface((TILE_SIZE, TILE_SIZE*2))
+            image.blit(base, (0,0))
+            image.blit(tip, (0, TILE_SIZE))
+            
+            self.image = image
+            
+        if self.state == 'up':
+            tip = pygame.image.load('graphics/chain/tip.png').convert_alpha()
+            tip = pygame.transform.scale(tip, (TILE_SIZE, TILE_SIZE))
+            self.image = tip
+            
+    def interact(self, player):
+        print('interacting')
+        if self.state == 'down':
+            print('pulling chain')
+            self.state = 'up'
+            self.prep_images()
+        else:
+            self.state = 'down'
+            self.prep_images()
+    
+    def tint(self, color):
+        self.image = tint_icon(self.image, color)
+    
+class Button(StaticTile):
+    def __init__(self, pos, state = 'off'):
+        self.state = state
+        self.image = pygame.image.load('graphics/button/'+ state + '.png').convert_alpha()
+        self.surface = self.image
+       # self.surface = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        super().__init__(pos, TILE_SIZE, self.surface)
+        
+    def interact(self, player):
+        if self.state == 'off':
+            self.state = 'on'
+        else:
+            self.state = 'off'    
+        self.image = pygame.image.load('graphics/button/' + self.state + 'png').convert_alpha()
+      #  self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))         
+            
 class Spike(StaticTile):
     def __init__(self, pos, type):
         terrain_list = import_cut_graphics('graphics/terrain/terrain_tiles.png')
@@ -154,8 +211,7 @@ class SpikeTrap(StaticTile):
             
     def bleed(self):
         self.image = tint_icon(self.image, RED)
-        
-    
+            
 class ItemIcon(StaticTile):
     def __init__(self, pos, item):
         self.item = item
