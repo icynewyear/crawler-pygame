@@ -145,11 +145,11 @@ class Player(pygame.sprite.Sprite):
                 step = True
             
         #ladder          
-        if keys[pygame.K_UP] and self.check_grid('self', 'L'):
+        if keys[pygame.K_UP] and self.check_grid('self', 'L') and not self.check_grid('up', 'W') and self.check_grid('up', 'L') != 'OOB':
             self.update_grid_pos('up')
             self.rect.y -= self.speed 
             step = True
-        elif keys[pygame.K_DOWN] and (self.check_grid('down', 'L') or (self.check_grid('self', 'L') and not self.check_grid('down', 'VC'))):
+        elif keys[pygame.K_DOWN] and self.check_grid('down','L') != 'OOB' and (self.check_grid('down', 'L') or (self.check_grid('self', 'L') and not self.check_grid('down', 'VC'))):
             self.update_grid_pos('down')
             self.rect.y += self.speed
             step = True
@@ -194,7 +194,7 @@ class Player(pygame.sprite.Sprite):
         
         #checks if the check is out of bounds
         if check_y < 0 or check_y > TILE_HEIGHT - 1 or check_x < 0 or check_x > TILE_WIDTH - 1:
-           return False
+           return 'OOB'
        
         gridcheck = self.grid[check_y][check_x]
         
@@ -261,6 +261,8 @@ class Player(pygame.sprite.Sprite):
     def do_gravity(self):
         """applies gravity to the player"""
         test = self.check_grid('down', 'VC')
+        if test == 'OOB':
+            return False
         if not test:
             self.update_grid_pos('down')
             self.rect.y = self.grid_pos[1] * TILE_SIZE
